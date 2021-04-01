@@ -1,0 +1,34 @@
+$px = 1 / 75rem;
+.mixed-wrap {
+  padding: 24 * $px;
+  background-color: #E4F8F2;
+  border-radius: 16 * $px;
+  &-img {
+    float: left;
+    width: 80 * $px;
+    height: 80 * $px;
+    border-radius: 8 * $px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  &-content {
+    margin-left: 104 * $px;
+    .title {
+      font-size: 28 * $px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 8 * $px;
+      &-sub {
+        float: right;
+        font-size: 24 * $px;
+        color: #5093E3;
+      }
+    }
+    &-text {
+      font-size: 24 * $px;
+      color: #999;
+      text-align: justify;
+    }
+  }
+}

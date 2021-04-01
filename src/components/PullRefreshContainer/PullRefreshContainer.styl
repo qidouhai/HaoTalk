@@ -1,0 +1,44 @@
+//@import '../../common/base.styl';
+$px = 1 / 40rem;
+.pull-refresh-container {
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border: none;
+  .content-wrapper {
+    padding: 1px 0 50 * $px;
+    .refresh-note {
+      position: relative;
+      margin: 24 * $px auto;
+      text-align: center;
+      .text {
+        font-size: 30 * $px;
+        line-height: 42 * $px;
+        color: #4a90e2;
+      }
+      > img.pull-note {
+        display: block;
+        width: 20 * $px;
+        height: 23 * $px;
+        line-height: 23 * $px;
+        margin: 12 * $px auto;
+      }
+    }
+  }
+  .top-state {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    font-size: 28 * $px;
+    overflow: hidden;
+    .state-info {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+    }
+  }
+}

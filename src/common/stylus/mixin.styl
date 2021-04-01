@@ -1,0 +1,54 @@
+// border-b-1px($color)
+//   position:relative
+//   &:after
+//     display:block
+//     position:absolute
+//     width:100%
+//     left:0
+//     bottom:0
+//     border-top:1px solid $color
+//     content:''
+
+// border-t-1px($color)
+//   position:relative
+//   &:before
+//     display:block
+//     position:absolute
+//     width:100%
+//     left:0
+//     top:0
+//     border-top:1px solid $color
+//     content:''
+// 全局颜色
+color-w = #fff
+color-g = #f4f4f6
+color-b = #2e2c6b
+
+/* unit: 1rem = 37.5 *$px */
+/*$px : (320 / 750) * (1 / 16) * 1rem;*/
+$px = 1 / 75rem;
+//  1像素边框
+border-1px()
+  position:relative
+  &:before
+    content: '';
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #f0f0f0;
+    width: 100%;
+    height: 1px;
+    z-index: 10;
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+  
+.hoverreact 
+  transform: all 0.2s ease-in-out;
+  -webkit-transform: all 0.2s ease-in-out;
+  &:active 
+    background-color: #eee;
