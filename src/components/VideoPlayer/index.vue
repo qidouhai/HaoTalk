@@ -13,7 +13,6 @@
         controls
         x5-video-player-type="h5"
         x5-video-player-fullscreen="true"
-        autoplay="true"
         @play="getWidthAndHeight"
         @canplaythrough="getWidthAndHeight"
       />

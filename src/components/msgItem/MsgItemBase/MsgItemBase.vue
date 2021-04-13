@@ -1,20 +1,23 @@
 <template>
   <div class="msg-item-base">
     <div
-      v-if="(!isSpecialMsg) && context.sendTime && context.showTime"
+      v-if="(!isSpecialMsg) && context.sendtime && context.showTime"
       class="timestamp"
     >
-      <span>{{ timeFormat }}</span>
+      <span>{{ time }}</span>
     </div>
 
     <!-- 消息类型 -->
     <div v-if="!isSpecialMsg" class="base-container">
       <div
-        v-if="showAvatarAndName"
         class="avatar"
-        :style="{ backgroundImage: `url(${context.avatar})` }"
-      ></div>
-      <div v-else-if="showAvatarHolder" class="avatar-holder"></div>
+        :class="msgSide"
+        :style="{'margin-right':!context.fromSelf && 0.6+'rem',
+                'margin-left':context.fromSelf && 0.6+'rem'}"
+      >
+        <img :src="context.avatar" >
+      </div>
+      <!-- <div v-else-if="showAvatarHolder" class="avatar-holder"></div> -->
       <div class="base-content" :class="msgSide">
         <div v-if="showAvatarAndName" class="name">
           {{ context.name }}
@@ -42,19 +45,14 @@
     </div>
 
     <!-- 系统提示 -->
-    <div v-if="isConvNote" class="sys-msg-note">
-      <span>{{ context.text }}</span>
+    <div v-if="isSysNote" class="sys-msg-note">
+      <span>{{ context.context }}</span>
     </div>
 
-    <!-- 图文混排消息 -->
-    <div v-if="isMixedPicTextMsg" class="mixed-pic-text">
-      <MixedPicTextItem :context="context"></MixedPicTextItem>
-    </div>
   </div>
 </template>
 
 <script>
-import MixedPicTextItem from '../MixedPicTextItem'
 import { timeFormat } from '../../../libs/utils'
 export default {
   name: 'msg-item-base',
@@ -62,9 +60,6 @@ export default {
   data () {
     return {
     }
-  },
-  components: {
-    MixedPicTextItem
   },
   computed: {
     msgSide () {
@@ -80,26 +75,26 @@ export default {
     isSysMsg () {
       return this.context.msgtype === 'SYSTEM'
     },
-    isConvNote () {
-      return this.context.msgtype === 'CONVERSATION_NOTE'
+    isSysNote () {
+      return this.context.msgtype === 'SYSTEM_NOTE'
     },
     isMixedPicTextMsg () {
       return this.context.msgtype === 'MIXED_PIC_TEXT'
     },
     isSpecialMsg () {
       return (
-        this.isSysMsg || this.isMixedPicTextMsg || this.isConvNote
+        this.isSysMsg || this.isMixedPicTextMsg || this.isSysNote
       )
     },
-    timeFormat () {
-      return timeFormat(new Date(this.context.sendTime), 'YYYY-MM-DD HH:mm') //  2018-02-21 16:20
+    time () {
+      return timeFormat(this.context.sendtime, 'yyyy-mm-dd hh:MM') //  2018-02-21 16:20
     },
     nameFlag () {
       return this.context.msgTag || ''
     },
     // 显示头像和名称
     showAvatarAndName () {
-      return true
+      return false
       // return !this.context.fromSelf
     },
     showAvatarHolder () {

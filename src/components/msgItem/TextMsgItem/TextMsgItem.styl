@@ -1,20 +1,41 @@
 
-$px = 1 / 75rem;
-.text-msg-content {
+$px = 1 / 30rem;
+.text-msg-content
   font-size: 30 * $px;
   line-height: 1.5;
+  border-radius: 4px
   padding: 18 * $px 24 * $px;
   letter-spacing: 0;
   word-break: break-all;
   white-space: pre-wrap;
   -webkit-user-select: text;
   user-select: contain;
-  img {
+  img 
     max-width: 100%;
     height: auto;
-  }
-  .image-wrap {
+  
+  .image-wrap 
     max-width: 100%;
     height: auto;
-  }
-}
+
+  &:before
+    visibility: var(--showright)
+    content: '';
+    position: absolute;
+    top: 4px
+    right: -20px
+    width: 0;
+    height: 0;
+    border: 10px solid transparent
+    border-left-color: #43ad7f7f 
+  &:after
+    visibility: var(--showleft)
+    content: '';
+    position: absolute;
+    top: 4px
+    left: -20px
+    width: 0;
+    height: 0;
+    border: 10px solid transparent
+    border-right-color:#F5F5DC
+

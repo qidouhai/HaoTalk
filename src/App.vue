@@ -15,7 +15,6 @@
       <bottom-tab class="tab"></bottom-tab>
     </div>
     <my-sidebar style="z-index:101;"></my-sidebar>
-    <my-personindex class="my-personindex" v-if="personindex"></my-personindex>
     <my-search v-if="search"></my-search>
   </div>
 </template>
@@ -56,9 +55,6 @@ export default {
   background color-g
   .color-b
     color: color-b
-  .my-personindex
-    .mu-icon.material-icons
-      color color-b
   .container-top
     position fixed
     z-index 101

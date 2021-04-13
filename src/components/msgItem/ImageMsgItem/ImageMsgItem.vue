@@ -9,7 +9,7 @@ export default {
   props: ['context'],
   computed: {
     imgUrl () {
-      return this.context.text
+      return this.context.context
     }
   },
   methods: {
@@ -17,7 +17,7 @@ export default {
       this.$emit('loaded')
     },
     clicked () {
-      this.$emit('img-clicked', this.context)
+      this.$emit('img-clicked', this.imgUrl)
     }
   }
 }

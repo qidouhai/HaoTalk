@@ -2,12 +2,12 @@
   <div class="index">
     <div class="top" :style="{backgroundImage: `url(${userData.avatar})`}">
       <mu-appbar :zDepth="0">
-        <mu-icon-button icon="arrow_back"
-                        slot="left"
-                        @click="showPersonindex_x" style="background:white;"/>
+        <mu-button color="purple" slot="left" @click="back" style="background:white;">
+          <mu-icon value="arrow_back"></mu-icon>
+        </mu-button>
         <div class="right-top"
              slot="right">
-          <mu-icon-button icon="more_vert" style="background:white;"/>
+          <mu-icon value="more_vert" style="background:white;"/>
         </div>
       </mu-appbar>
       <div class="c">
@@ -56,15 +56,18 @@
         <h1>学习</h1>
       </div>
     </div>
-    <mu-tabs class="bottom" >
-      <mu-tab value="tab1"
-              icon="videocam" />
-      <mu-tab value="tab2"
-              icon="phone" color="#f00"/>
-      <mu-tab value="tab3"
-              icon="chat_bubble"
-              @click="showDialog_x" />
+    <mu-tabs class="bottom" full-width color="blue">
+      <mu-tab>
+        个性名片
+      </mu-tab>
+      <mu-tab @click="showEditinfo">
+        编辑资料
+      </mu-tab>
+      <mu-tab @click="showDialog_x">
+        发消息
+      </mu-tab>
     </mu-tabs>
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -77,25 +80,24 @@ export default {
     }
   },
   computed: {
-    ...mapState(['activeId', 'data']),
-    ...mapGetters(['friend'],
+    ...mapState(['activeId']),
+    ...mapGetters(
       {userData: 'nowUserData'})
   },
   methods: {
-    ...mapMutations(['getActiveId', 'showPersonindex', 'showDialog']),
+    ...mapMutations(['getActiveId']),
     handleTabChange (val) {
       this.activeTab = val
     },
-    showPersonindex_x () {
-      this.getActiveId({ activeId: 0 })
-      this.showPersonindex()
+    back () {
+      this.$router.go(-1)
     },
     showDialog_x () {
       // 判定打开的是不是自己的主页，如果是则无法点击对话
-      if (this.activeId !== 0) {
-        this.showDialog()
-        this.showPersonindex()
-      }
+
+    },
+    showEditinfo () {
+      this.$router.push({path: '/personinfo/editinfo'})
     }
   }
 }
@@ -106,7 +108,7 @@ export default {
   color:#f00
 .index
   position: absolute
-  z-index: 102
+  z-index: 999
   top: 0
   left: 0
   width: 100%

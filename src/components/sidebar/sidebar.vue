@@ -62,10 +62,10 @@ export default {
     })
   },
   methods: {
-    ...mapMutations(['showSidebar', 'showPersonindex']),
+    ...mapMutations(['showSidebar']),
     showPersonindex_x () {
       this.showSidebar()
-      this.showPersonindex()
+      this.$router.push({path: '/personinfo'})
     }
   }
 }

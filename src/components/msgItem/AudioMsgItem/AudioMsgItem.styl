@@ -1,0 +1,89 @@
+$px = 1 / 30rem;
+.audio-msg-content
+  border-radius: 4px
+  padding: 10 * $px 10 * $px;
+  -webkit-user-select: text;
+  user-select: contain;
+  &:before
+    visibility: var(--showright)
+    content: '';
+    position: absolute;
+    top: 4px
+    right: -20px
+    width: 0;
+    height: 0;
+    border: 10px solid transparent
+    border-left-color: #43ad7f7f 
+  &:after
+    visibility: var(--showleft)
+    content: '';
+    position: absolute;
+    top: 4px
+    left: -20px
+    width: 0;
+    height: 0;
+    border: 10px solid transparent
+    border-right-color:#F5F5DC
+  .self__audio 
+    .audio__duration 
+      display: inline-block;
+      line-height: 32px;
+      height: 32px;
+      padding-right: 6px;
+      color: #888888;
+    .audio__trigger 
+      cursor: pointer;
+      vertical-align: top;
+      display: inline-block;
+      line-height: 32px;
+      height: 32px;
+      width: 100px;
+      border-radius: 4px;
+      position: relative;
+      .wifi-symbol 
+        position: absolute;
+        right: 4px;
+        top: -8px;
+        width: 50px;
+        height: 50px;
+        box-sizing: border-box;
+        overflow: hidden;
+        transform: rotate(-45deg) scale(0.5);
+        .wifi-circle 
+          border: 5px solid #999999;
+          border-radius: 50%;
+          position: absolute;
+        .first 
+          width: 5px;
+          height: 5px;
+          background: #cccccc;
+          top: 45px;
+          left: 45px;
+        .second 
+          width: 25px;
+          height: 25px;
+          top: 35px;
+          left: 35px;
+        .third 
+          width: 40px;
+          height: 40px;
+          top: 25px;
+          left: 25px;
+      .wifi-symbol--avtive 
+        .second 
+          animation: bounce 1s infinite 0.2s;
+        .third 
+          animation: bounce 1s infinite 0.4s;
+        
+      
+    
+    @keyframes bounce {
+      0% {
+        opacity: 0; /*初始状态 透明度为0*/
+      }
+      100% {
+        opacity: 1; /*结尾状态 透明度为1*/
+      }
+    }
+  
+

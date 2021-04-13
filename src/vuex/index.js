@@ -21,13 +21,12 @@ export default new Vuex.Store({
     messageList: [],
     ischatting: false,
     sidebar: false,
-    personindex: false,
     search: false,
-    headerTitle: 'message',
+    headerTitle: '消息',
     data: {},
     isAjax: false,
     activeId: '',
-    chatList: []
+    chatList: []// 当前消息
   },
   getters: {
     nowFriendList: (state) => {
@@ -46,9 +45,22 @@ export default new Vuex.Store({
         username: state.userdata.username || '吴彦祖'}
     },
     nowChatList: (state) => {
-      return state.chatList.map(item => {
-
+      return state.chatList
+    },
+    nowHistoryList: (state) => {
+      let list = state.messageList.filter(item => {
+        return item.uid == state.activeId
+      })[0].list
+      // console.log('打印historylist', list)
+      list.forEach(data => {
+        blobToFile(data)
+        if (data.sender == state.userdata.userid) {
+          data.fromSelf = true
+        } else {
+          data.fromSelf = false
+        }
       })
+      return list
     }
   },
   mutations: {
@@ -57,9 +69,6 @@ export default new Vuex.Store({
     },
     showSidebar: (state, {flag} = {}) => {
       state.sidebar = !state.sidebar
-    },
-    showPersonindex: (state) => {
-      state.personindex = !state.personindex
     },
     showSearch: (state) => {
       state.search = !state.search
@@ -74,24 +83,6 @@ export default new Vuex.Store({
     getActiveId: (state, {activeId}) => {
       state.activeId = activeId
     },
-    changeList: (state, obj) => {
-      let now = new Date()
-      let time = `${now.getHours()}:${now.getMinutes()}`
-      if (obj.self) {
-        state.messageList.forEach((item, index, arr) => {
-          if (item._id === obj._id) {
-            obj._id = 0
-            item.list.push({...obj, time})
-          }
-        })
-      } else {
-        state.messageList.forEach((item, index, arr) => {
-          if (item._id === obj._id) {
-            item.list.push({ ...obj, time })
-          }
-        })
-      }
-    },
     removeMessage: (state, {_id}) => {
       state.messageList.forEach((item, index, arr) => {
         if (item._id === _id) {
@@ -100,12 +91,6 @@ export default new Vuex.Store({
       })
     },
     updateMessageList: (state, msg) => {
-      console.log(msg)
-      msg.forEach(item => {
-        item.list.forEach(data => {
-          blobToFile(data)
-        })
-      })
       state.messageList = msg
       state.isAjax = true
     },
@@ -115,10 +100,16 @@ export default new Vuex.Store({
     updateUserData: (state, data) => {
       state.userdata = data[0]
     },
-    addToChatList: (state, msg) => {
-      state.chatList.push(msg)
+    addToChatlist: (state, data) => {
+      state.chatList.push(data)
     },
-    clearChatList: (state) => {
+    clearChatlist: (state) => {
+      state.messageList.forEach(msg => {
+        if (msg.uid == state.activeId) {
+          msg.list.push(...state.chatList)
+          msg.splice(-1, 10)
+        }
+      })
       state.chatList = []
     }
   },
@@ -132,7 +123,7 @@ export default new Vuex.Store({
         method: 'post'
       })
       context.commit('updateMessageList', res.respData)
-      // console.log(res)
+      console.log('获取消息列表', res)
     },
     async getFriends (context) {
       console.log(context.state.userdata.userid)
@@ -151,7 +142,10 @@ export default new Vuex.Store({
         }
       })
       context.commit('updateUserData', res.respData)
-      // console.log(res)
+      // console.log('获取个人信息',res)
+    },
+    SOCKET_MESSAGE (context, data) {
+      // console.log('websocket消息', data)
     }
   }
 })

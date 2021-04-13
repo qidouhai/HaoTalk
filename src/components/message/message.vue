@@ -12,26 +12,21 @@
                     avatar>
         <!--头像-->
         <mu-list-item-action>
-        <mu-avatar>
-          <img :src="item.avatar">
-        </mu-avatar>
+          <mu-avatar>
+            <img :src="item.avatar">
+          </mu-avatar>
         </mu-list-item-action>
-        <mu-list-item-content>
-        <mu-list-item-title>这个周末一起吃饭么?</mu-list-item-title>
-        <mu-list-item-sub-title>
-          <span style="color: rgba(0, 0, 0, .87)">Myron Liu -</span>{{item.list[item.list.length-1].context}}
-        </mu-list-item-sub-title>
-      </mu-list-item-content>
-        <!--时间与待处理-->
+          <mu-list-item-content>
+          <mu-list-item-title>{{item.littlename||item.name}}</mu-list-item-title>
+          <mu-list-item-sub-title>
+            <span v-show="isGroup" style="color: rgba(0, 0, 0, .87)">{{item.name}}</span>{{item.list[item.list.length-1].context}}
+          </mu-list-item-sub-title>
+          </mu-list-item-content>
         <div class="item-right">
-          <!--获取到当前聊天队列，最后一条内容的time-->
           <span class="time">{{item.list[item.list.length-1].sendtime|formattime}}</span>
-          <!--数据需求是为字符串-->
           <mu-badge :content="`${item.list.length}`" color='#f44336' />
         </div>
       </mu-list-item>
-      <!--分割线-->
-      <!--阻止时间冒泡-->
       <div class="delete" @click.stop="removeM(item._id)">删除</div>
     </div>
   </mu-list>
@@ -54,7 +49,8 @@ export default {
   name: 'message',
   data () {
     return {
-      isSwipe: [false, false, false]
+      isSwipe: [false, false, false],
+      isGroup: false
     }
   },
   computed: {
@@ -78,7 +74,6 @@ export default {
     formattime (time) {
       let nowtime = Date.now()
       let seconds = (nowtime - time) / 1000
-      console.log('打印time',time)
       var result
       if (seconds < 300) {
         result = '刚刚'
@@ -102,7 +97,6 @@ export default {
     }
   },
   created () {
-    console.log('新建message')
     this.$store.dispatch('getMessage')
     this.$store.dispatch('getUserdata')
   },
@@ -169,16 +163,14 @@ export default {
       transition:all 0.3s linear
       .item-right
         position:absolute
+        top: 10px
         right: 20px
         .time
           display: inline-block
-          position: absolute
-          top: -10px
-          left: -16px
         .mu-badge
           display: inline-block
           position: absolute
-          top: 0
+          top: 10px
           left: -10px
           border-radius: 5px
     .delete

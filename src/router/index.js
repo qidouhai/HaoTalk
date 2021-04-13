@@ -5,6 +5,8 @@ import friends from '../components/friends/friends.vue'
 import discover from '../components/discover/discover.vue'
 import Login from '../Login.vue'
 import chatWindow from '../components/dialog/dialog.vue'
+import personinfo from '../components/personindex/personindex.vue'
+import editinfo from '../components/personindex/editinfo.vue'
 
 Vue.use(Router)
 
@@ -18,9 +20,9 @@ const router = new Router({
     {
       path: '/message',
       name: 'message',
-      /* meta: {
+      meta: {
         requireAuth: true
-      }, */
+      },
       component: message
     },
     {
@@ -37,18 +39,28 @@ const router = new Router({
       path: '/dialog/:uid',
       name: 'dialog',
       component: chatWindow
+    },
+    {
+      path: '/personinfo',
+      name: 'personinfo',
+      component: personinfo,
+      children: [
+        {
+          path: 'editinfo',
+          name: 'editinfo',
+          component: editinfo
+        }
+      ]
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  // console.log(to.fullPath)
   if (to.matched.some(record => record.meta.requireAuth)) { // 判断该路由是否需要登录权限
-    console.log('需要登录')
     if (localStorage.getItem('token')) { // 判断当前的token是否存在 ； 登录存入的token
       next()
     } else {
-      router.push({path: '/login'})
+      router.replace({path: '/login'})
       // next({
       //   path: '/login',
       //   query: {redirect: router.currentRoute.fullPath} // 将跳转的路由path作为参数，登录成功后跳转到该路由
@@ -57,6 +69,10 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+})
+
+router.afterEach((to, from) => {
+
 })
 
 export default router

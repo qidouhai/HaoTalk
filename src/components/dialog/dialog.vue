@@ -39,7 +39,6 @@
         <component
           :is="getMsgItemType(item)"
           :context="item"
-          :data-msgid="item.msgId"
           @img-clicked="picClicked"
           @video-clicked="videoClicked"
         >
@@ -59,7 +58,6 @@
         <component
           :is="getMsgItemType(item)"
           :context="item"
-          :data-msgid="item.msgId"
           @loaded="scrollToBottom"
           @img-clicked="picClicked"
           @video-clicked="videoClicked"
@@ -75,8 +73,8 @@
                        :rows="1"
                        :rows-max="6"
                        @focus="focus"
-                       @keyup.enter.native="sendValue"/>
-        <mu-button icon color="primary" @click="sendValue">
+                       @keyup.enter.native="send"/>
+        <mu-button icon color="primary" @click="send">
           <mu-icon value="send"></mu-icon>
         </mu-button>
       </div>
@@ -140,6 +138,14 @@ import MsgItemBase from '../msgItem/MsgItemBase/MsgItemBase'
 import TextMsgItem from '../msgItem/TextMsgItem/TextMsgItem'
 import ImageMsgItem from '../msgItem/ImageMsgItem/ImageMsgItem'
 import VideoMsgItem from '../msgItem/VideoMsgItem/VideoMsgItem'
+import AudioMsgItem from '../msgItem/AudioMsgItem/AudioMsgItem'
+
+const msgTypeMap = {
+  text: 'TextMsgItem',
+  video: 'VideoMsgItem',
+  image: 'ImageMsgItem',
+  audio: 'AudioMsgItem'
+}
 export default {
   name: 'chatwindow',
   components: {
@@ -149,7 +155,8 @@ export default {
     MsgItemBase,
     TextMsgItem,
     ImageMsgItem,
-    VideoMsgItem
+    VideoMsgItem,
+    AudioMsgItem
   },
   data () {
     return {
@@ -162,10 +169,10 @@ export default {
       showVideoPlayer: false,
       messageTipFlag: false, // 新消息提示显示开关
       messageScrollFlag: false, // 滚动高度过高，出现自动滚到底部辅助按钮
-      historyList: [],
       curVideoString: '',
       historyPageNo: 1,
-      progressBar: 0
+      progressBar: 0,
+      bigPicUrl: ''
     }
   },
   mounted () {
@@ -177,6 +184,7 @@ export default {
       headerTitle: 'headerTitle'
     }),
     ...mapGetters({
+      historyList: 'nowHistoryList',
       chatList: 'nowChatList'
     }),
     isExtensionOpen () {
@@ -189,38 +197,58 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['getActiveId', 'showPersonindex', 'addToChatList', 'clearChatList']),
-    showDialog_x () {
-      this.getActiveId({ activeId: 0 })
-      this.$router.push(this.headerTitle)
-    },
+    ...mapMutations(['getActiveId', 'showPersonindex', 'addToChatlist', 'clearChatlist']),
     showPersonindex_x () {
-      this.showPersonindex()
-      this.$router.push(this.headerTitle)
+      this.$router.push({path: '/personinfo'})
     },
-    async sendValue (e) {
+    decorateMsg (item, type) {
       let msg = {}
-      if (this.value.trim()) {
-        msg.context = this.value.trim()
-        msg.sendTime = Date.now()
-        msg.msgtype = 'CONVERSATION_NOTE'
-        msg.from = this.userdata.userid
-        msg.avatar = this.userdata.avatar
-        msg.isSending = true
-        msg.sendFailed = false
+      msg.context = item
+      msg.contexttype = type
+      msg.sendtime = Date.now()
+      msg.msgtype = 'CONVERSATION_NOTE'
+      msg.sender = this.userData.userid
+      msg.avatar = this.userData.avatar
+      msg.receiver = this.$store.state.activeId
+      msg.isSending = true
+      msg.sendFailed = false
+      msg.fromSelf = true
+      return msg
+    },
+    async send (e) {
+      if (this.msgTxt.trim()) {
+        let msg = this.decorateMsg(this.msgTxt.trim(), 'text')
         this.addMsg(msg)
-        http('/sendmessage', {method: 'post', data: msg})
+        const res = await this.sendMsg(msg)
+        if (res.respCode == 0) { msg.isSending = false } else {
+          msg.sendFailed = true
+        }
       } else {
-        console.log('不能为空')
+        return
       }
-      this.value = ''
+      this.msgTxt = ''
+    },
+    async resendMsg (item) {
+      const res = await this.sendMsg(item)
+      if (res.respCode == 0) {
+        item.isSending = false
+      } else {
+        item.isSending = false
+        item.sendFailed = true
+      }
+    },
+    async sendMsg (item) {
+      const res = await http('/sendmessage', {
+        data: item,
+        method: 'post'
+      })
+      return res
     },
     closeDialog () {
       this.$router.go(-1)
     },
     openEmoji () {
       this.isEmojiAreaOpen = !this.isEmojiAreaOpen
-      console.log(1)
     },
     focus () {
       this.closeExtensionArea()
@@ -265,15 +293,41 @@ export default {
         containerElem.scrollTop = containerElem.scrollHeight - scrollBottom - 40
       }, 0)
     },
+    getFileData (item) {
+      return new Promise((resolve, reject) => {
+        var reader = new FileReader()
+        reader.onload = function () {
+          resolve(this.result)
+        }
+        reader.readAsDataURL(item)
+      })
+    },
     async uploadFile (e) {
       console.log(e.target.files)
       let files = e.target.files
-      let formData = new FormData()
-      formData.append('file', files)
-      const res = await http('/sendmessage', {
-        data: formData,
-        method: 'post'
+      let filequeue = []
+      let resqueue = []
+      for (let item of files) {
+        const file = await this.getFileData(item)
+        let msg = this.decorateMsg(file, /.*(?=\/)/.exec(item.type)[0])
+        filequeue.push(msg)
+        this.addMsg(msg)
+      }
+      for (let item of filequeue) {
+        resqueue.push(await this.sendMsg(item))
+      }
+      resqueue.forEach((item, index) => {
+        if (item.respCode == 0) {
+          filequeue[index].isSending = false
+        } else {
+          filequeue[index].isSending = false
+          filequeue[index].sendFailed = true
+        }
       })
+      /* let formData = new FormData()
+      formData.append('file', files)
+      const res = await this.sendMsg(formData)
+      console.log(res) */
     },
     containerFocused () {
       this.closeExtensionArea()
@@ -337,13 +391,21 @@ export default {
       this.showVideoPlayer = true
       this.curVideoString = videoUrl
     },
+    // 点击图片
+    picClicked (item) {
+      this.bigPicUrl = item
+      this.isBigPicsVisible = true
+    },
+    bigPicClicked () {
+      this.bigPicUrl = ''
+      this.isBigPicsVisible = false
+    },
     addMsg (msg, isServerNew) {
-      const lastMsg = this.historyList[this.historyList.length - 1]
-      if (lastMsg && msg.sendTime - lastMsg.sendTime < 2 * 60 * 1000) {
-        msg.showTime = false
+      const lastMsg = this.chatList[this.chatList.length - 1] || this.historyList[this.historyList.length - 1]
+      if (lastMsg && msg.sendtime - lastMsg.sendtime > 2 * 60 * 1000) {
+        msg.showTime = true
       }
-      this.addToChatList(msg)
-
+      this.addToChatlist(msg)
       this.$nextTick(() => {
         const box = document.querySelector('.msg-list-container')
         // 如果是收到的系统的消息 判断现在消息框是滚动到底才执行新消息滚动
@@ -382,7 +444,7 @@ export default {
       })
     },
     getMsgItemType (item) {
-      return item.msgtype
+      return msgTypeMap[item.contexttype]
     },
     showMessageTip () {
       const container = document.querySelector('.msg-list-container')
@@ -395,6 +457,12 @@ export default {
     isExtensionOpen (newVal) {
       if (newVal) {
         this.scrollToBottom()
+      }
+    },
+    $route (to, from) {
+      if (to.name === 'dialog') {
+        // console.log(this.historyList)
+        const params = to.params.uid
       }
     }
   }
