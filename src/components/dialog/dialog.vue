@@ -130,7 +130,7 @@
 <script>
 import { http } from '../../libs/http'
 import { mapState, mapMutations, mapGetters } from 'vuex'
-import {debounce} from '../../libs/utils'
+import {debounce, getVideoCover} from '../../libs/utils'
 import PullRefreshContainer from '../PullRefreshContainer/PullRefreshContainer'
 import emojiArea from '../EmojiArea/EmojiArea.vue'
 import VideoPlayer from '../VideoPlayer'
@@ -201,9 +201,13 @@ export default {
     showPersonindex_x () {
       this.$router.push({path: '/personinfo'})
     },
-    decorateMsg (item, type) {
+    async decorateMsg (item, type) {
+      let videocover
+      if (type == 'video') {
+        videocover = await getVideoCover(item)
+      }
       let msg = {}
-      msg.context = item
+      msg.context = type == 'video' ? item + '|' + videocover : item
       msg.contexttype = type
       msg.sendtime = Date.now()
       msg.msgtype = 'CONVERSATION_NOTE'
@@ -217,7 +221,7 @@ export default {
     },
     async send (e) {
       if (this.msgTxt.trim()) {
-        let msg = this.decorateMsg(this.msgTxt.trim(), 'text')
+        let msg = await this.decorateMsg(this.msgTxt.trim(), 'text')
         this.addMsg(msg)
         const res = await this.sendMsg(msg)
         if (res.respCode == 0) { msg.isSending = false } else {
@@ -309,7 +313,7 @@ export default {
       let resqueue = []
       for (let item of files) {
         const file = await this.getFileData(item)
-        let msg = this.decorateMsg(file, /.*(?=\/)/.exec(item.type)[0])
+        let msg = await this.decorateMsg(file, /.*(?=\/)/.exec(item.type)[0])
         filequeue.push(msg)
         this.addMsg(msg)
       }
@@ -504,6 +508,7 @@ export default {
     bottom: 0;
     left: 0;
     background: #000;
+    z-index: inherit;
     .big-pic
       width: 100%;
       height: 100%;
@@ -511,7 +516,7 @@ export default {
       background-position: center;
       background-repeat: no-repeat;
   .mu-appbar
-    position: fixed
+    position: relative
     top: 0
     left: 0
     width: 100%

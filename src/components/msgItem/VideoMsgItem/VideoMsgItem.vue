@@ -14,20 +14,15 @@ export default {
   name: 'video-msg-item',
   props: ['context'],
   data () {
-    return {
-      show: false
-    }
-  },
-  components: {
-    // VideoPlayer,
+    return {}
   },
   computed: {
     imgUrl () {
-      const [videoString, videoCoverString] = this.context.text && this.context.text.split('|')
+      const [videoString, videoCoverString] = this.context.context && this.context.context.split('|')
       return videoCoverString
     },
     videoUrl () {
-      const [videoString, videoCoverString] = this.context.text && this.context.text.split('|')
+      const [videoString, videoCoverString] = this.context.context && this.context.context.split('|')
       return videoString
     }
   },
@@ -36,29 +31,21 @@ export default {
       this.$emit('loaded')
     },
     clicked () {
-      this.show = true
       this.$emit('video-clicked', this.videoUrl)
     }
-    // hideVideo() {
-    //   this.show = false
-    // },
   }
 }
 </script>
 
 <style scoped lang="stylus">
-  $px = 1 / 75rem;
+  $px = 1 / 30rem;
   .image-msg-wrapper {
-    // display: flex;
     position: relative;
-    width: 255 * $px;
-    height: 255 * $px;
+    max-width: 255 * $px;
     .image-msg {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      // max-width: 255 * $px;
-      // height: auto;
     }
     .video-icon {
       position: absolute;

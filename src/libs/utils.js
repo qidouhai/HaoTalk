@@ -87,3 +87,23 @@ export function timeFormat (date, fmStr) {
 
   return fmStr
 }
+
+export function getVideoCover (data) {
+  return new Promise((resolve, reject) => {
+    var dataURL
+    let video = document.createElement('video')
+    video.setAttribute('crossOrigin', 'anonymous') // 处理跨域
+    video.setAttribute('src', data)
+    video.setAttribute('width', 400)
+    video.setAttribute('height', 240)
+    video.currentTime = 1
+    video.addEventListener('loadeddata', function () {
+      var canvas = document.createElement('canvas')
+      canvas.width = video.width
+      canvas.height = video.height
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.width)
+      dataURL = canvas.toDataURL('image/jpeg')
+      resolve(dataURL)
+    })
+  })
+}

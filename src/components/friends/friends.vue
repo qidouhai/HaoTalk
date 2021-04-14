@@ -82,7 +82,6 @@ export default {
     }
   },
   created () {
-    console.log('friends新建')
     this.$store.dispatch('getFriends')
   },
   methods: {

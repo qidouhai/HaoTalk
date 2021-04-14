@@ -126,7 +126,6 @@ export default new Vuex.Store({
       console.log('获取消息列表', res)
     },
     async getFriends (context) {
-      console.log(context.state.userdata.userid)
       const res = await http('/getfriends', {
         data: {
           uid: context.state.userdata.userid

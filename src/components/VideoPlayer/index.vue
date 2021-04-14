@@ -1,7 +1,6 @@
 <template>
   <div>
     <div v-show="show" class="videoMask" @click="hideVideo">
-      <div class="videoClose" @click="hideVideo">关闭</div>
       <video
         v-if="displayVideoElem"
         ref="videoPlayer"
@@ -40,7 +39,7 @@ export default {
   data () {
     return {
       curVideoUrl: '',
-      playPromise: null // 为什么要保存playPromise见 https://developers.google.com/web/updates/2017/06/play-request-was-interrupted
+      playPromise: null
     }
   },
   computed: {
@@ -69,11 +68,11 @@ export default {
         this.curVideoUrl = playUrl
       }
       const node = document.createElement('source')
-      while (node.lastChild) {
-        node.removeChild(node.lastChild)
+      while (this.$refs.videoPlayer.lastChild) {
+        this.$refs.videoPlayer.removeChild(this.$refs.videoPlayer.lastChild)
       }
       node.src = playUrl
-      node.type = 'video/mp4'
+      // node.type = 'video/mp4'
       this.$refs.videoPlayer.appendChild(node)
       this.$refs.videoPlayer.load()
       this.playPromise = this.$refs.videoPlayer.play()
@@ -127,22 +126,7 @@ $px = 1 / 75rem;
     z-index: 100000;
     background-color: rgba(0, 0, 0, 0.9);
     .video {
-      width: 750 * $px;
-      height: 100vh;
-    }
-    .videoClose {
-      position: absolute;
-      top: 120 * $px;
-      right: 10 * $px;
-      width: 110 * $px;
-      height: 50 * $px;
-      line-height: 48 * $px;
-      text-align: center;
-      border-radius: 10 * $px;
-      color: #a0a0a0;
-      background-color: #2c2c2c;
-      font-size: 28 * $px;
-      z-index: 99999;
+      width: 100%;
     }
   }
 </style>
