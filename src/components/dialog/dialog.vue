@@ -226,6 +226,7 @@ export default {
         const res = await this.sendMsg(msg)
         if (res.respCode == 0) { msg.isSending = false } else {
           msg.sendFailed = true
+          msg.isSending = false
         }
       } else {
         return
@@ -308,6 +309,13 @@ export default {
     },
     async uploadFile (e) {
       console.log(e.target.files)
+      let check = Array.from(e.target.files).every(item => {
+        return item.size <= 22475497
+      })
+      if (!check) {
+        console.log('所选文件不能超过20MB')
+        return
+      }
       let files = e.target.files
       let filequeue = []
       let resqueue = []
