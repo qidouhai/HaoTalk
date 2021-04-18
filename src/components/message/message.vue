@@ -97,6 +97,7 @@ export default {
     }
   },
   created () {
+    this.$store.dispatch('getFriends')
     this.$store.dispatch('getMessage')
     this.$store.dispatch('getUserdata')
   },

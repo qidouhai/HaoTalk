@@ -8,10 +8,10 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userdata: {
-      userid: '1033170126',
-      avatar: '/static/images/avatar_me.jpg',
-      username: '吴彦祖',
-      motto: 'i was supposed to chart and celebrate',
+      userid: localStorage.getItem('uid'),
+      avatar: '',
+      username: '',
+      motto: '',
       phone: '',
       address: '',
       birthday: '',
@@ -31,18 +31,18 @@ export default new Vuex.Store({
   getters: {
     nowFriendList: (state) => {
       return state.friendList.map(item => {
-        return {...item, avatar: item.avatar || 'static/images/avatar.jpg', name: item.name || '彭于晏'}
+        return {...item, avatar: item.avatar || 'static/images/avatar.jpg', name: item.username || '用户' + item.friendid}
       })
     },
     nowMessageList: (state) => {
       return state.messageList.map(item => {
-        return {...item, name: item.name || '彭于晏', avatar: item.avatar || '/static/images/avatar.jpg'}
+        return {...item, name: item.name || '用户' + item.uid, avatar: item.avatar || '/static/images/avatar.jpg'}
       })
     },
     nowUserData: (state) => {
       return {...state.userdata,
-        avatar: state.userdata.avatar || '/static/images/avatar_me.jpg',
-        username: state.userdata.username || '吴彦祖'}
+        avatar: state.userdata.avatar || '/static/images/avatar.jpg',
+        username: state.userdata.username || '用户' + state.userdata.userid}
     },
     nowChatList: (state) => {
       return state.chatList
@@ -64,9 +64,6 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    setUid: (state, id) => {
-      state.userdata.userid = id
-    },
     showSidebar: (state, {flag} = {}) => {
       state.sidebar = !state.sidebar
     },
@@ -96,6 +93,8 @@ export default new Vuex.Store({
     },
     updateFriendList: (state, data) => {
       state.friendList = data
+      let idList = state.friendList.map(item => { return item.friendid })
+      localStorage.setItem('idList', JSON.stringify(idList))
     },
     updateUserData: (state, data) => {
       state.userdata = data[0]
@@ -117,7 +116,7 @@ export default new Vuex.Store({
     async getMessage (context) {
       const res = await http('/getmessage', {
         data: {
-          idList: ['1033170127'],
+          idList: JSON.parse(localStorage.getItem('idList')),
           uid: context.state.userdata.userid
         },
         method: 'post'
@@ -132,7 +131,7 @@ export default new Vuex.Store({
         }
       })
       context.commit('updateFriendList', res.respData)
-      // console.log(res)
+      console.log('获取朋友列表', res)
     },
     async getUserdata (context) {
       const res = await http('/getuserdata', {
@@ -141,7 +140,7 @@ export default new Vuex.Store({
         }
       })
       context.commit('updateUserData', res.respData)
-      // console.log('获取个人信息',res)
+      console.log('获取个人信息', res)
     },
     SOCKET_MESSAGE (context, data) {
       // console.log('websocket消息', data)

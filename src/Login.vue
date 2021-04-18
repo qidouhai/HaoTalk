@@ -86,7 +86,7 @@ export default {
       console.log(res)
       if (res.respCode === 0) {
         localStorage.setItem('token', res.respData)
-        await this.$store.commit('setUid', this.validateForm.userid)
+        localStorage.setItem('uid', this.validateForm.userid)
         await this.$toast.success(res.respMsg)
         this.$router.replace('/message')
       } else {
@@ -102,7 +102,7 @@ export default {
       console.log(res)
       if (res.respCode === 0) {
         localStorage.setItem('token', res.respData)
-        await this.$$store.commit('setUid', this.validateForm.userid)
+        localStorage.setItem('uid', this.validateForm.userid)
         await this.$toast.success(res.respMsg)
         this.$router.replace('/message')
       } else {
