@@ -143,7 +143,6 @@ export default new Vuex.Store({
       console.log('获取个人信息', res)
     },
     SOCKET_MESSAGE (context, data) {
-      console.log('websocket消息', data, context)
       if (data.sender == context.state.activeId) {
         context.commit('addToChatlist', data)
       } else {

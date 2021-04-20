@@ -464,16 +464,15 @@ export default {
       }
     }
   },
+  beforeRouteLeave (to, from, next) {
+    console.log('路由离开清除activeid,以及chatlist')
+    this.getActiveId({activeId: null})
+    next()
+  },
   watch: {
     isExtensionOpen (newVal) {
       if (newVal) {
         this.scrollToBottom()
-      }
-    },
-    $route (to, from) {
-      if (to.name === 'dialog') {
-        // console.log(this.historyList)
-        const params = to.params.uid
       }
     }
   }

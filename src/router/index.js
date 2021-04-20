@@ -60,19 +60,11 @@ router.beforeEach((to, from, next) => {
     if (localStorage.getItem('token')) { // 判断当前的token是否存在 ； 登录存入的token
       next()
     } else {
-      router.replace({path: '/login'})
-      // next({
-      //   path: '/login',
-      //   query: {redirect: router.currentRoute.fullPath} // 将跳转的路由path作为参数，登录成功后跳转到该路由
-      // })
+      next({path: '/login'})
     }
   } else {
     next()
   }
-})
-
-router.afterEach((to, from) => {
-
 })
 
 export default router
