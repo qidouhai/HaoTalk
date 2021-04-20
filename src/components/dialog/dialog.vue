@@ -216,7 +216,6 @@ export default {
       msg.receiver = this.$store.state.activeId
       msg.isSending = true
       msg.sendFailed = false
-      msg.fromSelf = true
       return msg
     },
     async send (e) {

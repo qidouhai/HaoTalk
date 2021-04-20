@@ -23,7 +23,6 @@ export default new Vuex.Store({
     sidebar: false,
     search: false,
     headerTitle: '消息',
-    data: {},
     isAjax: false,
     activeId: '',
     chatList: []// 当前消息
@@ -45,7 +44,9 @@ export default new Vuex.Store({
         username: state.userdata.username || '用户' + state.userdata.userid}
     },
     nowChatList: (state) => {
-      return state.chatList
+      return state.chatList.map(item => {
+        return {...item, fromSelf: item.sender == state.userdata.userid}
+      })
     },
     nowHistoryList: (state) => {
       let list = state.messageList.filter(item => {
@@ -53,12 +54,7 @@ export default new Vuex.Store({
       })[0].list
       // console.log('打印historylist', list)
       list.forEach(data => {
-        blobToFile(data)
-        if (data.sender == state.userdata.userid) {
-          data.fromSelf = true
-        } else {
-          data.fromSelf = false
-        }
+        data.fromSelf = data.sender == state.userdata.userid
       })
       return list
     }
@@ -69,10 +65,6 @@ export default new Vuex.Store({
     },
     showSearch: (state) => {
       state.search = !state.search
-    },
-    getData: (state, data) => {
-      state.data = data
-      state.isAjax = true
     },
     changeTitle: (state, {title}) => {
       state.headerTitle = title
@@ -101,6 +93,14 @@ export default new Vuex.Store({
     },
     addToChatlist: (state, data) => {
       state.chatList.push(data)
+    },
+    addToMessagelist: (state, data) => {
+      state.messageList.forEach(item => {
+        if (item.uid == data.sender) {
+          item.list.splice(0, 1)
+          item.list.push(data)
+        }
+      })
     },
     clearChatlist: (state) => {
       state.messageList.forEach(msg => {
@@ -143,7 +143,12 @@ export default new Vuex.Store({
       console.log('获取个人信息', res)
     },
     SOCKET_MESSAGE (context, data) {
-      // console.log('websocket消息', data)
+      console.log('websocket消息', data, context)
+      if (data.sender == context.state.activeId) {
+        context.commit('addToChatlist', data)
+      } else {
+        context.commit('addToMessagelist', data)
+      }
     }
   }
 })

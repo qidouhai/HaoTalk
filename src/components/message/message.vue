@@ -34,6 +34,9 @@
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import { timeFormat } from '../../libs/utils'
+import VueSocketIO from 'vue-socket.io'
+import Vue from 'vue'
+import store from '../../vuex/index'
 
 const matchDay = {
   1: '星期一',
@@ -96,10 +99,25 @@ export default {
       return result
     }
   },
-  created () {
-    this.$store.dispatch('getFriends')
-    this.$store.dispatch('getMessage')
-    this.$store.dispatch('getUserdata')
+  async created () {
+    await this.$store.dispatch('getUserdata')
+    await this.$store.dispatch('getFriends')
+    await this.$store.dispatch('getMessage')
+    Vue.use(new VueSocketIO({
+      debug: true,
+      // 服务器端地址
+      connection: 'http://localhost:7001/',
+      vuex: {
+        store,
+        actionPrefix: 'SOCKET_',
+        mutationPrefix: 'SOCKET_'
+      },
+      options: {
+        query: {
+          userId: this.$store.state.userdata.userid
+        }
+      }
+    }))
   },
   mounted () {
     setTimeout(() => {

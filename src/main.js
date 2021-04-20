@@ -5,7 +5,6 @@ import App from './App'
 import router from './router'
 import store from './vuex/index'
 import VueLazyload from 'vue-lazyload'
-import VueSocketIO from 'vue-socket.io'
 
 // 引入muse-ui
 import MuseUi from 'muse-ui'
@@ -36,16 +35,6 @@ Vue.use(VueLazyload, {
   attempt: 1,
   listenEvents: ['scroll']
 })
-Vue.use(new VueSocketIO({
-  debug: true,
-  // 服务器端地址
-  connection: 'http://localhost:7001/',
-  vuex: {
-    store,
-    actionPrefix: 'SOCKET_',
-    mutationPrefix: 'SOCKET_'
-  }
-}))
 Vue.config.productionTip = false
 router.replace('/message')
 /* eslint-disable no-new */
