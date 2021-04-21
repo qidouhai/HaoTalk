@@ -40,41 +40,74 @@
             <mu-icon value="folder"  :size="40" :iconSize="20" ></mu-icon>
           </mu-avatar>
         </mu-list-item-action>
-        <span>
-          <span style="color: rgba(0, 0, 0, .5)">print.pdf</span>
-        </span>
+        <mu-list-item-content>
+            <mu-list-item-title>print.pdf</mu-list-item-title>
+        </mu-list-item-content>
         <div class="item-right">
           <span class="time">2019.10.1</span>
         </div>
       </mu-list-item>
       </mu-list>
     </div>
+    <mu-tabs :value.sync="active" inverse color="secondary" text-color="rgba(0, 0, 0, .54)"  full-width class="sticky">
+      <mu-tab>好友</mu-tab>
+      <mu-tab>分组</mu-tab>
+      <mu-tab>群聊</mu-tab>
+    </mu-tabs>
     <div class="title-3">
-      <span style="color: rgba(0, 0, 0, .8)">我的朋友</span>
-    </div>
-    <mu-list>
-      <!--动态渲染-->
-      <div v-for="(item,index) in friends" class="item" :key="index">
-        <mu-list-item avatar button @click="showPersonindex(item._id)"
-                      :ripple="true">
-          <mu-list-item-action>
-            <mu-avatar>
-              <img :src="item.avatar">
-            </mu-avatar>
-          </mu-list-item-action>
-          <mu-list-item-title>{{item.name}}</mu-list-item-title>
-          <mu-list-item-action>
-            <mu-icon value="chat_bubble"></mu-icon>
-          </mu-list-item-action>
-        </mu-list-item>
-        <mu-divider inset/>
+      <div class="demo-text" v-if="active === 0">
+        <mu-list>
+          <!--动态渲染-->
+          <div v-for="(item,index) in friends" class="item" :key="index">
+            <mu-list-item avatar button @click="showPersonindex(item._id)"
+                          :ripple="true">
+              <mu-list-item-action>
+                <mu-avatar>
+                  <img :src="item.avatar">
+                </mu-avatar>
+              </mu-list-item-action>
+              <mu-list-item-title>{{item.name}}</mu-list-item-title>
+              <mu-list-item-action>
+                <mu-icon value="chat_bubble"></mu-icon>
+              </mu-list-item-action>
+            </mu-list-item>
+            <mu-divider inset/>
+          </div>
+        </mu-list>
       </div>
-    </mu-list>
+      <div class="demo-text" v-if="active === 1">
+          <mu-expansion-panel>
+            <div slot="header">朋友</div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
+            <mu-button slot="action" flat>Cancel</mu-button>
+            <mu-button slot="action" flat color="primary">Save</mu-button>
+          </mu-expansion-panel>
+          <mu-expansion-panel>
+            <div slot="header">家人</div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
+          </mu-expansion-panel>
+          <mu-expansion-panel>
+            <div slot="header">同学</div>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
+          </mu-expansion-panel>
+      </div>
+      <div class="demo-text" v-if="active === 2">
+        <p>“不，这泪水……是因为勇气，因为力量，因为信任，……你不会懂的！”</p>
+        <p>“我不会帮你，想要什么样的未来……自己去追寻吧！”</p>
+        <p>“我不需要你的帮忙！未来我会一手开启，什么样的敌人我也不会惧怕……还有，其实我们可以成为朋友的……”</p>
+        <p>“也许吧，未来……给你了。”</p>
+      </div>
+    </div>
   </div>
 </template>
 <script>
 export default {
   name: 'friend',
+  data () {
+    return {
+      active: 1
+    }
+  },
   computed: {
     // 获取全部好友
     friends () {
@@ -96,6 +129,9 @@ export default {
 <style lang="stylus"  scoped>
 @import '../../common/stylus/base.styl'
 .friend
+  overflow-y scroll
+  position:relative
+  height:80vh
   .item
     background color-w
   .title-1
@@ -103,12 +139,6 @@ export default {
     height: 8vh
     line-height: 8vh
     text-align:center
-    // .mu-icon
-    //   position: absolute;
-    //   top:50%;
-    //   left: 10%;
-    //   transform:translate(-50%, -50%);
-    //   color: color-b
     .text
       display: inline-block
       vertical-align: top
@@ -131,7 +161,8 @@ export default {
     .item-right
       float: right
   .title-3
-    padding-left:4vw
-    height: 4vh
     line-height: 5vh
+  .sticky
+    position: sticky
+    top 0
 </style>

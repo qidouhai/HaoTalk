@@ -6,16 +6,13 @@
     </div>
     <div class="container-content">
       <div class="patch"></div>
-      <keep-alive>
       <router-view></router-view>
-      </keep-alive>
       <div class="patch"></div>
     </div>
     <div class="container-bottom">
       <bottom-tab class="tab"></bottom-tab>
     </div>
     <my-sidebar style="z-index:101;"></my-sidebar>
-    <my-search v-if="search"></my-search>
   </div>
 </template>
 
@@ -25,15 +22,13 @@ import bottomTab from './components/bottomtab/bottom-tab'
 import topNav from './components/topnav/top-nav'
 import mySidebar from './components/sidebar/sidebar'
 import myPersonindex from './components/personindex/personindex'
-import mySearch from './components/search/search'
 export default {
   name: 'App',
   components: {
     bottomTab,
     topNav,
     mySidebar,
-    myPersonindex,
-    mySearch
+    myPersonindex
   },
   computed: {
     ...mapState(['personindex', 'search'])
@@ -83,7 +78,7 @@ export default {
       top 0
       left 0
       width 100%
-      height 10.2vh
+      height 10vh
     .t-1
       color color-b
     .mu-tab-text.has-icon

@@ -1,5 +1,5 @@
 <template>
-  <div class="friend">
+  <div class="discover">
     <div class="gap"></div>
     <div class="tab">
       <mu-tabs full-width>
@@ -108,7 +108,7 @@ export default({
 </script>
 <style lang="stylus"  scoped>
 @import '../../common/stylus/base.styl'
-.friend
+.discover
   .item
     background: color-w
   .gap

@@ -7,7 +7,25 @@
       <div slot="default" class="title">
         <div class="title-item">{{headerTitle}}</div>
       </div>
-      <mu-icon slot="right" value="search" color="#2e2c6b" @click="showSearch" />
+      <mu-menu slot = "right" :open.sync="open">
+        <mu-button fab small color="primary">
+          <mu-icon value="add"></mu-icon>
+        </mu-button>
+        <mu-list slot="content">
+          <mu-list-item button @click="showSearch(true)">
+            <mu-icon value="add_comment"></mu-icon>
+            <mu-list-item-title>创建群聊</mu-list-item-title>
+          </mu-list-item>
+          <mu-list-item button @click="showSearch()">
+            <mu-icon value="person_add"></mu-icon>
+            <mu-list-item-title>添加好友/群</mu-list-item-title>
+          </mu-list-item>
+          <mu-list-item button @click="showSearch()">
+            <mu-icon value="search"></mu-icon>
+            <mu-list-item-title>搜索</mu-list-item-title>
+          </mu-list-item>
+        </mu-list>
+      </mu-menu>
     </mu-appbar>
   </div>
 </template>
@@ -15,6 +33,11 @@
 import { mapState, mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'topNav',
+  data () {
+    return {
+      open: false
+    }
+  },
   computed: {
     ...mapState({
       headerTitle: 'headerTitle'
@@ -24,9 +47,13 @@ export default {
     })
   },
   methods: {
-    ...mapMutations(['showSidebar', 'showSearch']),
+    ...mapMutations(['showSidebar']),
     showSidebar_x (flag) {
       this.showSidebar({ flag })
+    },
+    showSearch (flag = false) {
+      this.$router.push({name: 'search', params: {createroom: flag}})
+      this.open = false
     }
   }
 }
@@ -55,4 +82,7 @@ export default {
         font-weight: 500
         background: color-b
         color: color-w
+    .mu-menu
+      height:auto
+      margin-right : 10px
 </style>

@@ -19,7 +19,7 @@
           <mu-list-item-content>
           <mu-list-item-title>{{item.littlename||item.name}}</mu-list-item-title>
           <mu-list-item-sub-title>
-            <span v-show="isGroup" style="color: rgba(0, 0, 0, .87)">{{item.name}}</span>{{item.list[item.list.length-1].context}}
+            <span v-show="isGroup" style="color: rgba(0, 0, 0, .87)">{{item.name}}</span>{{item.list[item.list.length-1]|showLastmsg}}
           </mu-list-item-sub-title>
           </mu-list-item-content>
         <div class="item-right">
@@ -97,6 +97,26 @@ export default {
       }
       console.log('打印result', result)
       return result
+    },
+    showLastmsg (item) {
+      let name = ''
+      switch (item.contexttype) {
+        case 'text':
+          name = item.context
+          break
+        case 'video':
+          name = '【视频】'
+          break
+        case 'audio':
+          name = '【音频】'
+          break
+        case 'image':
+          name = '【图片】'
+          break
+        default:
+          break
+      }
+      return name
     }
   },
   async created () {

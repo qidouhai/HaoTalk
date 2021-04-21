@@ -19,9 +19,7 @@ export default new Vuex.Store({
     },
     friendList: [],
     messageList: [],
-    ischatting: false,
     sidebar: false,
-    search: false,
     headerTitle: '消息',
     isAjax: false,
     activeId: '',
@@ -65,9 +63,6 @@ export default new Vuex.Store({
   mutations: {
     showSidebar: (state, {flag} = {}) => {
       state.sidebar = !state.sidebar
-    },
-    showSearch: (state) => {
-      state.search = !state.search
     },
     changeTitle: (state, {title}) => {
       state.headerTitle = title

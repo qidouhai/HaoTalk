@@ -7,6 +7,7 @@ import Login from '../Login.vue'
 import chatWindow from '../components/dialog/dialog.vue'
 import personinfo from '../components/personindex/personindex.vue'
 import editinfo from '../components/personindex/editinfo.vue'
+import search from '../components/search/search.vue'
 
 Vue.use(Router)
 
@@ -41,7 +42,12 @@ const router = new Router({
       component: chatWindow
     },
     {
-      path: '/personinfo',
+      path: '/search',
+      name: 'search',
+      component: search
+    },
+    {
+      path: '/personinfo/:uid',
       name: 'personinfo',
       component: personinfo,
       children: [

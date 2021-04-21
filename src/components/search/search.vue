@@ -1,28 +1,63 @@
 <template>
   <div class="search">
     <mu-appbar :zDepth="0">
-      <mu-icon-button icon="arrow_back"
-                      slot="left"
-                      @click="showSearch" />
+      <mu-button icon slot="left" @click="back">
+        <mu-icon value="arrow_back"></mu-icon>
+      </mu-button>
       <mu-text-field class="appbar-search-field"
                      slot="default"
-                     hintText="好友姓名......"
                      v-model="value"
                      @input="input" />
-      <mu-icon-button icon="search"
-                      slot="right" />
+      <mu-button icon slot="right" @click="search">
+        <mu-icon value="search"></mu-icon>
+      </mu-button>
     </mu-appbar>
-    <mu-list>
-      <mu-sub-header>在输入框中，输入好友的名字</mu-sub-header>
-      <div v-for="(item,index) in friend" :key="index">
-        <mu-list-item :title="item.name"
-                      @click="showPersonindex_x(item._id)">
-          <mu-avatar :src="item.avatar"
-                     slot="leftAvatar" />
-          <mu-icon value="chat_bubble"
-                   slot="right" />
+    <mu-list v-if="!createroom">
+      <mu-sub-header>输入账号，群号码,消息</mu-sub-header>
+      <mu-sub-header v-if="stranger.length">陌生人/群</mu-sub-header>
+      <div v-for="(item,index) in stranger" :key="index">
+        <mu-list-item @click="showPersonindex_x(item._id)">
+          <mu-list-item-title>{{item.name}}</mu-list-item-title>
+          <mu-list-item-action>
+            <mu-avatar>
+              <img :src="item.avatar">
+            </mu-avatar>
+          </mu-list-item-action>
+          <mu-list-item-action>
+            <mu-icon value="chat_bubble"></mu-icon>
+          </mu-list-item-action>
         </mu-list-item>
       </div>
+      <mu-sub-header v-if="oldfriend.length">好友/群</mu-sub-header>
+      <div v-for="(item,index) in oldfriend" :key="index">
+        <mu-list-item @click="showPersonindex_x(item._id)">
+          <mu-list-item-title>{{item.name}}</mu-list-item-title>
+          <mu-list-item-action>
+            <mu-avatar>
+              <img :src="item.avatar">
+            </mu-avatar>
+          </mu-list-item-action>
+          <mu-list-item-action>
+            <mu-icon value="chat_bubble"></mu-icon>
+          </mu-list-item-action>
+        </mu-list-item>
+      </div>
+
+    </mu-list>
+    <mu-list v-else>
+      <mu-expansion-panel>
+        <div slot="header">朋友</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
+      </mu-expansion-panel>
+      <mu-expansion-panel>
+        <div slot="header">家人</div>
+        <mu-checkbox v-model="checkvals"/>
+        <span> Lorem </span>
+      </mu-expansion-panel>
+      <mu-expansion-panel>
+        <div slot="header">同学</div>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
+      </mu-expansion-panel>
     </mu-list>
   </div>
 </template>
@@ -33,21 +68,24 @@ export default {
   data () {
     return {
       value: '',
-      friend: []
+      stranger: [],
+      oldfriend: [],
+      checkvals: []
     }
   },
   computed: {
     ...mapState({
-      friends: state => state.data.friends
-    })
+      friends: state => state.friendList
+    }),
+    createroom () {
+      return this.$route.params.createroom
+    }
   },
   methods: {
-    ...mapMutations(['showSearch', 'showPersonindex', 'getActiveId']),
+    ...mapMutations(['getActiveId']),
     // 点击展示个人主页
     showPersonindex_x (id) {
-      this.showSearch()
-      this.getActiveId({ activeId: id })
-      this.showPersonindex()
+      this.$router.push({path: `/personinfo/${id}`})
     },
     input (val) {
       // 判断输入的值是否是数字
@@ -55,7 +93,7 @@ export default {
         this.friend = []
       } else if (isNaN(val)) {
         // 不是数字
-        this.friend = this.friends.filter(x => {
+        this.oldfriend = this.friends.filter(x => {
           if (x.name.indexOf(val) !== -1) {
             return true
           } else {
@@ -72,6 +110,13 @@ export default {
           }
         })
       }
+    },
+    back () {
+      this.$router.go(-1)
+    },
+    search () {
+      if (this.$route.params.createroom) {}
+
     }
   }
 }
