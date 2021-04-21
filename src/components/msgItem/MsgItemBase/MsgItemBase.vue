@@ -25,12 +25,12 @@
         </div>
         <slot></slot>
         <img
-          v-show="context.fromSelf && context.isSending && !context.sendFailed"
+          v-show="context.fromSelf && isSending && !sendFailed"
           class="state"
           src="../../../assets/sending.gif"
         />
         <img
-          v-show="context.fromSelf && context.sendFailed"
+          v-show="context.fromSelf && sendFailed"
           class="state"
           src="../../../assets/send_fail.png"
           @click="resend"
@@ -100,6 +100,12 @@ export default {
     showAvatarHolder () {
       return false
       // return !this.context.fromSelf
+    },
+    isSending () {
+      return this.context.isSending
+    },
+    sendFailed () {
+      return this.context.sendFailed
     }
   },
   methods: {

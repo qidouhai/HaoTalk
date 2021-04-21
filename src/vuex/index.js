@@ -49,6 +49,9 @@ export default new Vuex.Store({
       })
     },
     nowHistoryList: (state) => {
+      if (state.activeId == null) {
+        return []
+      }
       let list = state.messageList.filter(item => {
         return item.uid == state.activeId
       })[0].list
@@ -97,8 +100,8 @@ export default new Vuex.Store({
     addToMessagelist: (state, data) => {
       state.messageList.forEach(item => {
         if (item.uid == data.sender) {
-          item.list.splice(0, 1)
           item.list.push(data)
+          item.list.splice(0, item.list.length - 10)
         }
       })
     },
@@ -106,7 +109,7 @@ export default new Vuex.Store({
       state.messageList.forEach(msg => {
         if (msg.uid == state.activeId) {
           msg.list.push(...state.chatList)
-          msg.splice(-1, 10)
+          msg.list.splice(0, msg.list.length - 10)
         }
       })
       state.chatList = []

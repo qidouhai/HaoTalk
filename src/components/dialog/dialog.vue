@@ -49,7 +49,7 @@
 
       <msg-item-base
         v-for="(item, index) in chatList"
-        :key="'chat' + index"
+        :key="'chat'+index"
         class="common-msg-item"
         :context="item"
         @resend="resendMsg(item)"
@@ -233,13 +233,21 @@ export default {
       this.msgTxt = ''
     },
     async resendMsg (item) {
+      this.chatList.forEach((m) => {
+        if (m.sendtime === item.sendtime) {
+          console.log(m)
+          m.isSending = true
+          m.sendFailed = false
+        }
+      })
+
       const res = await this.sendMsg(item)
-      if (res.respCode == 0) {
+      /* if (res.respCode == 0) {
         item.isSending = false
       } else {
         item.isSending = false
         item.sendFailed = true
-      }
+      } */
     },
     async sendMsg (item) {
       const res = await http('/sendmessage', {
@@ -465,7 +473,7 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next) {
-    console.log('路由离开清除activeid,以及chatlist')
+    this.clearChatlist()
     this.getActiveId({activeId: null})
     next()
   },
