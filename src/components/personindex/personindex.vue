@@ -1,8 +1,8 @@
 <template>
   <div class="index">
-    <div class="top" :style="{backgroundImage: `url(${userData.avatar})`}">
+    <div class="top" :style="{backgroundImage: `url(${userData.backavatar})`}">
       <mu-appbar :zDepth="0">
-        <mu-button color="purple" slot="left" @click="back" style="background:white;">
+        <mu-button slot="left" @click="back" >
           <mu-icon value="arrow_back"></mu-icon>
         </mu-button>
         <div class="right-top"
@@ -11,12 +11,12 @@
         </div>
       </mu-appbar>
       <div class="c">
-        <mu-avatar :src="userData.avatar"
-                   :size="96" />
+        <mu-avatar :size="96">
+          <img :src="userData.avatar">
+        </mu-avatar>
         <span class="name">{{userData.username}}</span>
       </div>
-      <mu-tabs :value="activeTab"
-               @change="handleTabChange">
+      <mu-tabs :value="activeTab" @change="handleTabChange" full-width>
         <mu-tab value="tab1">个人信息</mu-tab>
         <mu-tab value="tab2">个性标签</mu-tab>
         <mu-tab value="tab3">个人兴趣</mu-tab>
@@ -24,36 +24,30 @@
     </div>
     <div class="content">
       <div v-if="activeTab === 'tab1'">
-        <mu-list>
-          <mu-list-item :describeText="userData.phone">
-            <mu-list-item-action>
-              <mu-icon value="voicemail" color="#2e2c6b"></mu-icon>
-            </mu-list-item-action>
-            <mu-list-item-title>电话</mu-list-item-title>
-          </mu-list-item>
-          <mu-list-item :describeText="userData.address">
-            <mu-list-item-action>
-              <mu-icon value="location_on" color="#2e2c6b"></mu-icon>
-            </mu-list-item-action>
-            <mu-list-item-title>地区</mu-list-item-title>
-          </mu-list-item>
-          <mu-list-item :describeText="userData.birthday">
-            <mu-list-item-action>
-              <mu-icon value="cake" color="#2e2c6b"></mu-icon>
-            </mu-list-item-action>
-            <mu-list-item-title>生日</mu-list-item-title>
-          </mu-list-item>
-        </mu-list>
+        <mu-form :model="userData" label-position="left">
+          <mu-form-item label="昵称">
+            <mu-text-field v-model="userData.username" ></mu-text-field>
+          </mu-form-item>
+          <mu-form-item label="性别">
+            <mu-text-field v-model="userData.sex" ></mu-text-field>
+          </mu-form-item>
+          <mu-form-item label="生日">
+            <mu-text-field v-model="userData.birthday" ></mu-text-field>
+          </mu-form-item>
+          <mu-form-item label="地址">
+            <mu-text-field v-model="userData.address" ></mu-text-field>
+          </mu-form-item>
+          <mu-form-item label="签名">
+            <mu-text-field v-model="userData.motto" ></mu-text-field>
+          </mu-form-item>
+          <mu-form-item label="简介">
+            <mu-text-field v-model="userData.introduction" ></mu-text-field>
+          </mu-form-item>
+        </mu-form>
       </div>
       <div v-if="activeTab === 'tab2'" style="padding-left:30px;">
-        <h1>手机控</h1>
-        <h1>低调</h1>
-        <h1>真率</h1>
       </div>
       <div v-if="activeTab === 'tab3'" style="padding-left:30px;">
-        <h1>听歌</h1>
-        <h1>跑步</h1>
-        <h1>学习</h1>
       </div>
     </div>
     <mu-tabs class="bottom" full-width color="blue">
@@ -71,21 +65,23 @@
   </div>
 </template>
 <script>
-import { mapState, mapGetters, mapMutations } from 'vuex'
+
+import { http } from '../../libs/http'
 export default {
   name: 'personindex',
   data () {
     return {
-      activeTab: 'tab1'
+      activeTab: 'tab1',
+      userData: {},
+      paramId: ''
     }
   },
-  computed: {
-    ...mapState(['activeId']),
-    ...mapGetters(
-      {userData: 'nowUserData'})
+  created () {
+    this.$nextTick(() => {
+      this.init()
+    })
   },
   methods: {
-    ...mapMutations(['getActiveId']),
     handleTabChange (val) {
       this.activeTab = val
     },
@@ -97,27 +93,47 @@ export default {
 
     },
     showEditinfo () {
-      this.$router.push({path: '/personinfo/editinfo'})
+      this.$router.push({path: `/personinfo/${this.$route.params.uid}/editinfo`})
+    },
+    async init () {
+      const res = await http('/getuserdata', {
+        data: {
+          uid: this.$route.params.uid
+        }
+      })
+      this.userData = res.respData[0]
+    }
+  },
+  watch: {
+    // 监听路由
+    $route () {
+      if (this.$route.params.uid !== null) {
+        this.paramId = this.$route.params.uid
+      }
+    },
+    paramId (newVal, oldVal) {
+      if (newVal !== undefined && newVal !== null) {
+        // 初始化数据
+        this.init()
+      }
     }
   }
 }
 </script>
 <style lang="stylus" scoped>
 @import '../../common/stylus/base.styl'
-.icons
-  color:#f00
 .index
+  overflow-y scroll
   position: absolute
   z-index: 999
   top: 0
   left: 0
   width: 100%
-  height: 100vh
+  height: 100%
   background: color-g
   .top
     position: relative
     height: 38vh
-    // background-image: url('./avatar.jpg')
     background-size: cover
     .c
       position: absolute
@@ -147,12 +163,8 @@ export default {
       left: 0
       z-index: 1
       background:rgba(0,0,0,0)
-  .content
-    .item
-      margin-top: 6px
-      margin-left: 20px
   .bottom
-    position: absolute
+    position: fixed
     left: 0
     bottom: 0
     background: color-w

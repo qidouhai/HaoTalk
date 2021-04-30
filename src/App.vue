@@ -6,7 +6,9 @@
     </div>
     <div class="container-content">
       <div class="patch"></div>
+      <keep-alive>
       <router-view></router-view>
+      </keep-alive>
       <div class="patch"></div>
     </div>
     <div class="container-bottom">
@@ -17,21 +19,15 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
 import bottomTab from './components/bottomtab/bottom-tab'
 import topNav from './components/topnav/top-nav'
 import mySidebar from './components/sidebar/sidebar'
-import myPersonindex from './components/personindex/personindex'
 export default {
   name: 'App',
   components: {
     bottomTab,
     topNav,
-    mySidebar,
-    myPersonindex
-  },
-  computed: {
-    ...mapState(['personindex', 'search'])
+    mySidebar
   },
   methods: {
     showSidebar (flag) {

@@ -1,9 +1,9 @@
 <template>
   <div class="dialog">
-    <mu-appbar :title="userData.username"
+    <mu-appbar :title="activeName"
                :zDepth="0">
-      <mu-button color="primary" @click="closeDialog">
-        <mu-icon left value="arrow_back"></mu-icon>
+      <mu-button color="primary" @click="closeDialog" slot="left">
+        <mu-icon value="arrow_back"></mu-icon>
         返回
       </mu-button>
       <div class="right-top" slot="right">
@@ -180,12 +180,12 @@ export default {
   },
   computed: {
     ...mapState({
-      userData: 'userdata',
-      headerTitle: 'headerTitle'
+      userData: 'userdata'
     }),
     ...mapGetters({
       historyList: 'nowHistoryList',
-      chatList: 'nowChatList'
+      chatList: 'nowChatList',
+      activeName: 'activeName'
     }),
     isExtensionOpen () {
       return this.isToolboxOpen || this.isEmojiAreaOpen
@@ -199,7 +199,8 @@ export default {
   methods: {
     ...mapMutations(['getActiveId', 'showPersonindex', 'addToChatlist', 'clearChatlist']),
     showPersonindex_x () {
-      this.$router.push({path: '/personinfo'})
+
+      this.$router.push({path: '/personinfo',})
     },
     async decorateMsg (item, type) {
       let videocover
@@ -242,12 +243,12 @@ export default {
       })
 
       const res = await this.sendMsg(item)
-      /* if (res.respCode == 0) {
+      if (res.respCode == 0) {
         item.isSending = false
       } else {
         item.isSending = false
         item.sendFailed = true
-      } */
+      }
     },
     async sendMsg (item) {
       const res = await http('/sendmessage', {

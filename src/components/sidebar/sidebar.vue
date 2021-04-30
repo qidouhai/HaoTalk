@@ -65,7 +65,7 @@ export default {
     ...mapMutations(['showSidebar']),
     showPersonindex_x () {
       this.showSidebar()
-      this.$router.push({path: '/personinfo'})
+      this.$router.push({path: `/personinfo/${this.userdata.userid}`})
     }
   }
 }

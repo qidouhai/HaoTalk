@@ -1,5 +1,5 @@
 <template>
-<div class="index">
+<div class="editinfo">
   <mu-appbar style="width: 100%" color="primary">
     <mu-button icon slot="left" @click="back">
       <mu-icon value="reply"></mu-icon>
@@ -189,7 +189,7 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-    .index
+    .editinfo
       position:fixed
       width: 100%
       height: 100%

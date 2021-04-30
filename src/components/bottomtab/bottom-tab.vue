@@ -1,6 +1,6 @@
 <template>
   <mu-bottom-nav :value="bottomNav" @change="handleChange" class="bottom-tab">
-    <mu-badge circle color="secondary" content="0" class="badge" id="badge">
+    <mu-badge circle color="secondary" content="0" class="badge" >
       <mu-bottom-nav-item value="消息" title="消息" icon="chat_bubble_outline" replace to="/message"/>
     </mu-badge>
     <mu-badge circle color="secondary" content="1" class="badge">
@@ -45,7 +45,7 @@ export default {
       width 100%
       height 100%
       font-size 15px
-  .badge em
-      top 0
-      right 9px
+/deep/.badge em
+    top 0
+    right 20px
 </style>

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { http } from '../libs/http'
-import { blobToFile } from '../libs/utils'
+import { updateIdList } from '../libs/utils'
 
 Vue.use(Vuex)
 
@@ -19,6 +19,7 @@ export default new Vuex.Store({
     },
     friendList: [],
     messageList: [],
+    groupList: [],
     sidebar: false,
     headerTitle: '消息',
     isAjax: false,
@@ -58,6 +59,20 @@ export default new Vuex.Store({
         data.fromSelf = data.sender == state.userdata.userid
       })
       return list
+    },
+    nowGroupList: (state) => {
+      return state.groupList.map(item => {
+        return {...item, avatar: item.avatar || 'static/images/avatar.jpg', name: item.roomname || '群聊'}
+      })
+    },
+    activeName: (state) => {
+      if (!state.activeId) return ''
+      let res = state.friendList.find(item => {
+        return item.friendid == state.activeId
+      })
+      return res ? res.username : state.groupList.find(item => {
+        return item.roomid == state.activeId
+      }).roomname
     }
   },
   mutations: {
@@ -84,7 +99,12 @@ export default new Vuex.Store({
     updateFriendList: (state, data) => {
       state.friendList = data
       let idList = state.friendList.map(item => { return item.friendid })
-      localStorage.setItem('idList', JSON.stringify(idList))
+      updateIdList(idList)
+    },
+    updateGroupList: (state, data) => {
+      state.groupList = data
+      let idList = state.groupList.map(item => { return item.roomid })
+      updateIdList(idList)
     },
     updateUserData: (state, data) => {
       state.userdata = data[0]
@@ -130,6 +150,15 @@ export default new Vuex.Store({
       })
       context.commit('updateFriendList', res.respData)
       console.log('获取朋友列表', res)
+    },
+    async getGroups (context) {
+      const res = await http('/getgroups', {
+        data: {
+          uid: context.state.userdata.userid
+        }
+      })
+      context.commit('updateGroupList', res.respData)
+      console.log('获取群组列表', res)
     },
     async getUserdata (context) {
       const res = await http('/getuserdata', {

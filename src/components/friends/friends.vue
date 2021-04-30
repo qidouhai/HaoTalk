@@ -59,7 +59,7 @@
         <mu-list>
           <!--动态渲染-->
           <div v-for="(item,index) in friends" class="item" :key="index">
-            <mu-list-item avatar button @click="showPersonindex(item._id)"
+            <mu-list-item avatar button @click="showPersonindex(item.friendid)"
                           :ripple="true">
               <mu-list-item-action>
                 <mu-avatar>
@@ -76,26 +76,52 @@
         </mu-list>
       </div>
       <div class="demo-text" v-if="active === 1">
-          <mu-expansion-panel>
+          <mu-expansion-panel class="expansion">
             <div slot="header">朋友</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
-            <mu-button slot="action" flat>Cancel</mu-button>
-            <mu-button slot="action" flat color="primary">Save</mu-button>
+          <mu-list>
+          <div v-for="(item,index) in friends" class="item" :key="index">
+            <mu-list-item avatar button @click="showPersonindex(item.friendid)"
+                          :ripple="true">
+              <mu-list-item-action>
+                <mu-avatar>
+                  <img :src="item.avatar">
+                </mu-avatar>
+              </mu-list-item-action>
+              <mu-list-item-title>{{item.name}}</mu-list-item-title>
+              <mu-list-item-action>
+                <mu-icon value="chat_bubble"></mu-icon>
+              </mu-list-item-action>
+            </mu-list-item>
+            <mu-divider inset/>
+          </div>
+          </mu-list>
           </mu-expansion-panel>
-          <mu-expansion-panel>
+          <mu-expansion-panel class="expansion">
             <div slot="header">家人</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
           </mu-expansion-panel>
-          <mu-expansion-panel>
+          <mu-expansion-panel class="expansion">
             <div slot="header">同学</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
           </mu-expansion-panel>
       </div>
       <div class="demo-text" v-if="active === 2">
-        <p>“不，这泪水……是因为勇气，因为力量，因为信任，……你不会懂的！”</p>
-        <p>“我不会帮你，想要什么样的未来……自己去追寻吧！”</p>
-        <p>“我不需要你的帮忙！未来我会一手开启，什么样的敌人我也不会惧怕……还有，其实我们可以成为朋友的……”</p>
-        <p>“也许吧，未来……给你了。”</p>
+        <mu-list>
+          <!--动态渲染-->
+          <div v-for="(item,index) in groups" class="item" :key="index">
+            <mu-list-item avatar button @click="showPersonindex(item.roomid)"
+                          :ripple="true">
+              <mu-list-item-action>
+                <mu-avatar>
+                  <img :src="item.avatar">
+                </mu-avatar>
+              </mu-list-item-action>
+              <mu-list-item-title>{{item.roomname}}</mu-list-item-title>
+              <mu-list-item-action>
+                <mu-icon value="chat_bubble"></mu-icon>
+              </mu-list-item-action>
+            </mu-list-item>
+            <mu-divider inset/>
+          </div>
+        </mu-list>
       </div>
     </div>
   </div>
@@ -105,13 +131,16 @@ export default {
   name: 'friend',
   data () {
     return {
-      active: 1
+      active: 0
     }
   },
   computed: {
     // 获取全部好友
     friends () {
       return this.$store.getters.nowFriendList
+    },
+    groups () {
+      return this.$store.getters.nowGroupList
     }
   },
   created () {
@@ -121,7 +150,7 @@ export default {
     // 点击展示个人主页
     showPersonindex (e) {
       this.$store.commit('getActiveId', { activeId: e })
-      this.$store.commit('showPersonindex')
+      this.$router.push({path: `/personinfo/${e}`})
     }
   }
 }
@@ -165,4 +194,5 @@ export default {
   .sticky
     position: sticky
     top 0
+
 </style>

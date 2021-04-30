@@ -120,8 +120,10 @@ export default {
     }
   },
   async created () {
+    console.log('message新建')
     await this.$store.dispatch('getUserdata')
     await this.$store.dispatch('getFriends')
+    await this.$store.dispatch('getGroups')
     await this.$store.dispatch('getMessage')
     Vue.use(new VueSocketIO({
       debug: true,

@@ -12,25 +12,29 @@
         <mu-icon value="search"></mu-icon>
       </mu-button>
     </mu-appbar>
-    <mu-list v-if="!createroom">
-      <mu-sub-header>输入账号，群号码,消息</mu-sub-header>
-      <mu-sub-header v-if="stranger.length">陌生人/群</mu-sub-header>
-      <div v-for="(item,index) in stranger" :key="index">
-        <mu-list-item @click="showPersonindex_x(item._id)">
-          <mu-list-item-title>{{item.name}}</mu-list-item-title>
-          <mu-list-item-action>
-            <mu-avatar>
-              <img :src="item.avatar">
-            </mu-avatar>
-          </mu-list-item-action>
-          <mu-list-item-action>
-            <mu-icon value="chat_bubble"></mu-icon>
-          </mu-list-item-action>
-        </mu-list-item>
-      </div>
+    <mu-sub-header>输入账号，群号码,消息</mu-sub-header>
+    <mu-list>
       <mu-sub-header v-if="oldfriend.length">好友/群</mu-sub-header>
       <div v-for="(item,index) in oldfriend" :key="index">
-        <mu-list-item @click="showPersonindex_x(item._id)">
+        <mu-list-item @click="showMainindex(item)">
+          <mu-checkbox v-if="createroom" v-model="checkvals"/>
+          <mu-list-item-action>
+            <mu-avatar>
+              <img :src="item.avatar">
+            </mu-avatar>
+          </mu-list-item-action>
+          <mu-list-item-title>{{item.username}}</mu-list-item-title>
+          <mu-list-item-action>
+            <mu-icon value="chat_bubble"></mu-icon>
+          </mu-list-item-action>
+        </mu-list-item>
+      </div>
+    </mu-list>
+
+    <mu-list v-if="!createroom">
+      <mu-sub-header v-if="stranger.length">陌生人/群</mu-sub-header>
+      <div v-for="(item,index) in stranger" :key="index">
+        <mu-list-item @click="showMainindex(item)">
           <mu-list-item-title>{{item.name}}</mu-list-item-title>
           <mu-list-item-action>
             <mu-avatar>
@@ -42,23 +46,36 @@
           </mu-list-item-action>
         </mu-list-item>
       </div>
-
     </mu-list>
+
     <mu-list v-else>
       <mu-expansion-panel>
         <div slot="header">朋友</div>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
+        <mu-list>
+          <div v-for="(item,index) in friends" :key="index">
+          <mu-list-item @click="showMainindex(item)">
+          <mu-checkbox v-model="checkvals"/>
+          <mu-list-item-action>
+            <mu-avatar>
+              <img :src="item.avatar">
+            </mu-avatar>
+          </mu-list-item-action>
+          <mu-list-item-title>{{item.username}}</mu-list-item-title>
+          <mu-list-item-action>
+            <mu-icon value="chat_bubble"></mu-icon>
+          </mu-list-item-action>
+        </mu-list-item>
+          </div>
+        </mu-list>
       </mu-expansion-panel>
       <mu-expansion-panel>
         <div slot="header">家人</div>
-        <mu-checkbox v-model="checkvals"/>
-        <span> Lorem </span>
       </mu-expansion-panel>
       <mu-expansion-panel>
         <div slot="header">同学</div>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
       </mu-expansion-panel>
     </mu-list>
+    <mu-button v-if="createroom" full-width color="primary" @click="buildroom" class="create-button">创建群聊</mu-button>
   </div>
 </template>
 <script>
@@ -84,17 +101,21 @@ export default {
   methods: {
     ...mapMutations(['getActiveId']),
     // 点击展示个人主页
-    showPersonindex_x (id) {
-      this.$router.push({path: `/personinfo/${id}`})
+    showMainindex (item) {
+      if (item.friendid) {
+        this.$router.push({path: `/personinfo/${item.friendid}`})
+      } else {
+        this.$router.push({path: `/groupinfo/${item.groupid}`})
+      }
     },
     input (val) {
       // 判断输入的值是否是数字
       if (val === '') {
-        this.friend = []
+        this.oldfriend = []
       } else if (isNaN(val)) {
         // 不是数字
         this.oldfriend = this.friends.filter(x => {
-          if (x.name.indexOf(val) !== -1) {
+          if (x.username.indexOf(val) !== -1 || x.littlename.indexOf(val) !== -1) {
             return true
           } else {
             return false
@@ -102,8 +123,8 @@ export default {
         })
       } else {
         // 是数字
-        this.friend = this.friends.filter(x => {
-          if (x.phone.indexOf(val) !== -1) {
+        this.oldfriend = this.friends.filter(x => {
+          if (x.friendid.indexOf(val) !== -1) {
             return true
           } else {
             return false
@@ -116,6 +137,8 @@ export default {
     },
     search () {
       if (this.$route.params.createroom) {}
+    },
+    buildroom () {
 
     }
   }
@@ -135,4 +158,7 @@ export default {
     height: 10vh
     color: #000
     background: color-w
+  .create-button
+    position fixed
+    bottom 3vh
 </style>

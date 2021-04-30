@@ -107,3 +107,14 @@ export function getVideoCover (data) {
     })
   })
 }
+
+export function updateIdList (list) {
+  let oldlist = JSON.parse(localStorage.getItem('idList'))
+  if (!oldlist) {
+    localStorage.setItem('idList', JSON.stringify(list))
+    return
+  }
+  oldlist.push(...list)
+  oldlist = [...new Set(oldlist)]
+  localStorage.setItem('idList', JSON.stringify(oldlist))
+}

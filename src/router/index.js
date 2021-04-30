@@ -8,6 +8,7 @@ import chatWindow from '../components/dialog/dialog.vue'
 import personinfo from '../components/personindex/personindex.vue'
 import editinfo from '../components/personindex/editinfo.vue'
 import search from '../components/search/search.vue'
+import groupinfo from '../components/groupindex/groupindex.vue'
 
 Vue.use(Router)
 
@@ -57,6 +58,11 @@ const router = new Router({
           component: editinfo
         }
       ]
+    },
+    {
+      path: '/groupinfo/:uid',
+      name: 'groupinfo',
+      component: groupinfo
     }
   ]
 })
