@@ -83,7 +83,6 @@ export default {
         return
       }
       const res = await http('/login', {data: this.validateForm, method: 'post'})
-      console.log(res)
       if (res.respCode === 0) {
         localStorage.setItem('token', res.respData)
         localStorage.setItem('uid', this.validateForm.userid)
@@ -99,7 +98,6 @@ export default {
         return
       }
       const res = await http('/signup', {data: this.validateForm, method: 'post'})
-      console.log(res)
       if (res.respCode === 0) {
         localStorage.setItem('token', res.respData)
         localStorage.setItem('uid', this.validateForm.userid)

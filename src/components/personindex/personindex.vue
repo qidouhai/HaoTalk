@@ -50,15 +50,26 @@
       <div v-if="activeTab === 'tab3'" style="padding-left:30px;">
       </div>
     </div>
-    <mu-tabs class="bottom" full-width color="blue">
-      <mu-tab>
+    <mu-tabs v-if="isMyself||isFriend" class="bottom" full-width color="blue">
+      <mu-tab v-if="isMyself">
         个性名片
       </mu-tab>
-      <mu-tab @click="showEditinfo">
+      <mu-tab v-else>
+        音视频通话
+      </mu-tab>
+      <mu-tab v-if="isMyself" @click="showEditinfo">
         编辑资料
       </mu-tab>
-      <mu-tab @click="showDialog_x">
+      <mu-tab v-else>
+        送礼物
+      </mu-tab>
+      <mu-tab @click="showDialog">
         发消息
+      </mu-tab>
+    </mu-tabs>
+    <mu-tabs v-else class="bottom" full-width color="blue">
+      <mu-tab>
+        加好友
       </mu-tab>
     </mu-tabs>
     <router-view></router-view>
@@ -81,6 +92,16 @@ export default {
       this.init()
     })
   },
+  computed: {
+    isMyself () {
+      return this.$route.params.uid == this.$store.state.userdata.userid
+    },
+    isFriend () {
+      return this.$store.state.friendList.find(item => {
+        return item.friendid == this.$route.params.uid
+      })
+    }
+  },
   methods: {
     handleTabChange (val) {
       this.activeTab = val
@@ -88,9 +109,8 @@ export default {
     back () {
       this.$router.go(-1)
     },
-    showDialog_x () {
-      // 判定打开的是不是自己的主页，如果是则无法点击对话
-
+    showDialog () {
+      this.$router.replace({path: `/dialog/${this.$route.params.uid}`})
     },
     showEditinfo () {
       this.$router.push({path: `/personinfo/${this.$route.params.uid}/editinfo`})
