@@ -110,7 +110,6 @@ export default new Vuex.Store({
       state.userdata = data[0]
     },
     addToChatlist: (state, data) => {
-      if (data.sender == state.userdata.userid) return
       state.chatList.push(data)
     },
     addToMessagelist: (state, data) => {
@@ -185,7 +184,8 @@ export default new Vuex.Store({
       console.log('获取个人信息', res)
     },
     SOCKET_MESSAGE (context, data) {
-      if (data.sender == context.state.activeId) {
+      if (data.sender == context.state.activeId || data.receiver == context.state.activeId) {
+        if (data.sender == context.state.userdata.userid) return
         context.commit('addToChatlist', data)
       } else {
         context.commit('addToMessagelist', data)
