@@ -54,7 +54,6 @@ export default new Vuex.Store({
       let list = state.messageList.filter(item => {
         return item.uid == state.activeId
       })[0].list
-      // console.log('打印historylist', list)
       list.forEach(data => {
         data.fromSelf = data.sender == state.userdata.userid
       })
@@ -115,7 +114,9 @@ export default new Vuex.Store({
     addToMessagelist: (state, data) => {
       if (data.sender == state.userdata.userid) return
       let target = state.messageList.find(item => {
-        return item.uid == data.sender || item.uid == data.receiver
+        if (data.receiver.startsWith('x')) {
+          return item.uid == data.receiver
+        } else { return item.uid == data.sender }
       })
       if (target) {
         target.list.push(data)
