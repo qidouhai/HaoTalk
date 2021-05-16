@@ -13,7 +13,7 @@
         <mu-button icon color="primary">
           <mu-icon value="call"></mu-icon>
         </mu-button>
-        <mu-button icon color="primary" @click="showPersonindex_x">
+        <mu-button icon color="primary" @click="showPersonindex">
           <mu-icon value="person"></mu-icon>
         </mu-button>
       </div>
@@ -198,9 +198,10 @@ export default {
   },
   methods: {
     ...mapMutations(['getActiveId', 'showPersonindex', 'addToChatlist', 'clearChatlist']),
-    showPersonindex_x () {
-
-      this.$router.push({path: '/personinfo',})
+    showPersonindex () {
+      if (this.$route.params.uid.startsWith('x')) {
+        this.$router.push({path: `/groupinfo/${this.$route.params.uid}`})
+      } else { this.$router.push({path: `/personinfo/${this.$route.params.uid}`}) }
     },
     async decorateMsg (item, type) {
       let videocover
@@ -267,10 +268,14 @@ export default {
       this.closeExtensionArea()
     },
     async fetchHistory () {
+      let lasttime = this.historyList[0].sendtime
       const data = await http('/fetchHistory', {
-        data: {pageNo: this.historyPageNo++
-        }
+        data: {time: lasttime,
+          uid: this.userData.userid,
+          roomid: this.$route.params.uid},
+        method:'post'
       })
+      console.log(data)
       if (data.messages && data.messages instanceof Array &&
             data.messages.length === 0 && data.subCid === null) {
         this.hasMoreHistory = false
@@ -295,7 +300,6 @@ export default {
                   msg.isHistory = true
 
                   const firstMsg = this.historyList[0]
-                  // firstMsg && console.info(`del: ${firstMsg.sendTime - msg.sendTime}`);
                   if (firstMsg && firstMsg.sendTime - msg.sendTime < 2 * 60 * 1000) {
                     firstMsg.showTime = false
                   }
@@ -482,6 +486,11 @@ export default {
     isExtensionOpen (newVal) {
       if (newVal) {
         this.scrollToBottom()
+      }
+    },
+    $route (to, from) {
+      if (to.path.startsWith('/dialog')) {
+        this.getActiveId({activeId: this.$route.params.uid})
       }
     }
   }

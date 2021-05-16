@@ -1,9 +1,8 @@
 <template>
   <!--判定ajax结束后，且有消息列表存在才开始渲染组件，防止报错-->
-  <mu-list v-if="isAjax&&nowMessageList">
+  <mu-list v-if="isAjax&&nowMessageList" >
     <!--设置列表删除时动态效果-->
-    <div v-for="(item, index) in nowMessageList"
-         :class="[{swipeleft: isSwipe[index]},'wrap']"
+    <div v-for="(item, index) in nowMessageList" class="wrap"
          @click="openDialog(item.uid)"
          ref="child"
          :key="index">
@@ -52,7 +51,6 @@ export default {
   name: 'message',
   data () {
     return {
-      isSwipe: [false, false, false],
       isGroup: false
     }
   },
@@ -95,7 +93,6 @@ export default {
       } else {
         result = timeFormat(time, 'yyyy-mm-dd')
       }
-      console.log('打印result', result)
       return result
     },
     showLastmsg (item) {
@@ -153,8 +150,8 @@ export default {
             y = e.changedTouches[0].pageY
             swipeX = true
             swipeY = true
-            this.isSwipe = [false, false, false]
-          })
+            //  element.classList.remove('swipeleft')
+          }, true)
           element.addEventListener('touchmove', e => {
             X = e.changedTouches[0].pageX
             Y = e.changedTouches[0].pageY
@@ -164,11 +161,11 @@ export default {
               // 右滑
               if (X - x > 10) {
                 e.preventDefault()
-                this.isSwipe.splice(index, 1, false)
+                element.classList.remove('swipeleft')
               }
               if (x - X > 10) {
                 e.preventDefault()
-                this.isSwipe.splice(index, 1, true)
+                element.classList.add('swipeleft')
               }
               swipeY = false
             }

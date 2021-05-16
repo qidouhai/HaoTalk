@@ -22,7 +22,7 @@ export default new Vuex.Store({
     groupList: [],
     sidebar: false,
     headerTitle: '消息',
-    isAjax: false,
+    isAjax: true,
     activeId: '',
     chatList: []// 当前消息
   },
@@ -110,15 +110,30 @@ export default new Vuex.Store({
       state.userdata = data[0]
     },
     addToChatlist: (state, data) => {
+      if (data.sender == state.userdata.userid) return
       state.chatList.push(data)
     },
     addToMessagelist: (state, data) => {
-      state.messageList.forEach(item => {
-        if (item.uid == data.sender) {
-          item.list.push(data)
-          item.list.splice(0, item.list.length - 10)
-        }
+      if (data.sender == state.userdata.userid) return
+      let target = state.messageList.find(item => {
+        return item.uid == data.sender || item.uid == data.receiver
       })
+      if (target) {
+        target.list.push(data)
+        target.list.splice(0, target.list.length - 10)
+      } else {
+        var res = data.receiver.startsWith('x')
+          ? state.groupList.find(item => { return item.roomid == data.receiver })
+          : state.friendList.find(item => { return item.friendid == data.sender })
+        state.messageList.push({
+          avatar: res.avatar,
+          name: data.receiver.startsWith('x') ? res.roomname : res.username,
+          list: [data],
+          uid: data.receiver.startsWith('x') ? res.roomid : res.friendid,
+          creater: data.receiver.startsWith('x') ? res.creater : null,
+          littlename: data.receiver.startsWith('x') ? null : res.littlename
+        })
+      }
     },
     clearChatlist: (state) => {
       state.messageList.forEach(msg => {
