@@ -20,13 +20,6 @@ export default {
     imgUrl () {
       const videoCoverString = this.context.context
       return videoCoverString
-    },
-    videoUrl () {
-      var videoString
-      INDEXDB.getItem(this.context.sender + this.context.sendtime, (res) => {
-        videoString = res
-      })
-      return videoString
     }
   },
   methods: {
@@ -34,7 +27,9 @@ export default {
       this.$emit('loaded')
     },
     clicked () {
-      this.$emit('video-clicked', this.videoUrl)
+      INDEXDB.getItem(this.context.sender + this.context.sendtime, (res) => {
+        this.$emit('video-clicked', res)
+      })
     }
   }
 }

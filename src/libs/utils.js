@@ -119,3 +119,11 @@ export function updateIdList (list) {
   localStorage.setItem('idList', JSON.stringify(oldlist))
 }
 
+export function deepcopy (obj) {
+  if (typeof obj !== 'object') return
+  var newobj = obj instanceof Array ? [] : {}
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) { newobj[key] = typeof obj[key] === 'object' ? deepcopy(obj[key]) : obj[key] }
+  }
+  return newobj
+}

@@ -130,7 +130,8 @@
 <script>
 import { http } from '../../libs/http'
 import { mapState, mapMutations, mapGetters } from 'vuex'
-import {debounce, getVideoCover} from '../../libs/utils'
+import {debounce, getVideoCover, deepcopy} from '../../libs/utils'
+import INDEXDB from '../../libs/indexDB'
 import PullRefreshContainer from '../PullRefreshContainer/PullRefreshContainer'
 import emojiArea from '../EmojiArea/EmojiArea.vue'
 import VideoPlayer from '../VideoPlayer'
@@ -268,7 +269,7 @@ export default {
       this.closeExtensionArea()
     },
     async fetchHistory (resolve) {
-      let lasttime = this.historyList[0]?this.historyList[0].sendtime : Date.now()
+      let lasttime = this.historyList[0] ? this.historyList[0].sendtime : Date.now()
       const data = await http('/fetchHistory', {
         data: {time: lasttime,
           uid: this.userData.userid,
@@ -319,7 +320,7 @@ export default {
         return item.size <= 22475497
       })
       if (!check) {
-        console.log('所选文件不能超过20MB')
+        this.$toast.error('所选文件不能超过20MB')
         return
       }
       let files = e.target.files
@@ -328,11 +329,19 @@ export default {
       for (let item of files) {
         const file = await this.getFileData(item)
         let msg = await this.decorateMsg(file, /.*(?=\/)/.exec(item.type)[0])
-        filequeue.push(msg)
-        this.addMsg(msg)
-      }
-      for (let item of filequeue) {
-        resqueue.push(await this.sendMsg(item))
+
+        if (msg.contexttype == 'video') {
+          let copymsg = deepcopy(msg)
+          msg.context = msg.context.split('|')[1]
+          this.addMsg(msg)
+          filequeue.push(msg)
+          INDEXDB.setItem(copymsg.sender + copymsg.sendtime, copymsg.context.split('|')[0])
+          resqueue.push(await this.sendMsg(copymsg))
+        } else {
+          this.addMsg(msg)
+          filequeue.push(msg)
+          resqueue.push(await this.sendMsg(msg))
+        }
       }
       resqueue.forEach((item, index) => {
         if (item.respCode == 0) {

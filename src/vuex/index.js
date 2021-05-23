@@ -96,10 +96,10 @@ export default new Vuex.Store({
     updateMessageList: (state, msg) => {
       msg.forEach(item => {
         item.list.forEach(data => {
-          if (data.contexttype == 'audio') {
-            INDEXDB.setItem(data.sender + data.sendtime, data.context)
+          if (data.contexttype == 'video') {
+            INDEXDB.setItem(data.sender + data.sendtime, data.context.split('|')[0])
+            data.context = data.context.split('|')[1]
           }
-          data.context = data.context.split('|')[0]
         })
       })
       state.messageList = msg
@@ -195,9 +195,9 @@ export default new Vuex.Store({
       console.log('获取个人信息', res)
     },
     SOCKET_MESSAGE (context, data) {
-      if (data.contexttype == 'audio') {
-        INDEXDB.setItem(data.sender + data.sendtime, data.context)
-        data.context = data.context.split('|')[0]
+      if (data.contexttype == 'video') {
+        INDEXDB.setItem(data.sender + data.sendtime, data.context.split('|')[0])
+        data.context = data.context.split('|')[1]
       }
       if (data.sender == context.state.activeId || data.receiver == context.state.activeId) {
         if (data.sender == context.state.userdata.userid) return
