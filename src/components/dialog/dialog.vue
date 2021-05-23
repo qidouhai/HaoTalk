@@ -267,17 +267,17 @@ export default {
     focus () {
       this.closeExtensionArea()
     },
-    async fetchHistory () {
-      let lasttime = this.historyList[0].sendtime
+    async fetchHistory (resolve) {
+      let lasttime = this.historyList[0]?this.historyList[0].sendtime : Date.now()
       const data = await http('/fetchHistory', {
         data: {time: lasttime,
           uid: this.userData.userid,
           roomid: this.$route.params.uid},
-        method:'post'
+        method: 'post'
       })
+      if (data.respCode !== 0) return
       console.log(data)
-      if (data.messages && data.messages instanceof Array &&
-            data.messages.length === 0 && data.subCid === null) {
+      if (data.respData.length < 10) {
         this.hasMoreHistory = false
       }
 
@@ -285,27 +285,21 @@ export default {
       const scrollBottom = containerElem.scrollHeight - containerElem.scrollTop
 
       const historyMsg = []
-      data.messages &&
-              data.messages instanceof Array &&
-              data.messages.forEach((item) => {
-                const msg = item // && convertHistoryMsg(item)
-                historyMsg.unshift(JSON.parse(JSON.stringify(msg || {})))
-                if (msg) {
-                  if (msg.fromSelf) {
-                    msg.avatar = msg.avatar || this.avatar
-                  } else {
-                    msg.avatar = msg.avatar
-                  }
-                  msg.showTime = true
-                  msg.isHistory = true
+      data.respData.forEach((item) => {
+        const msg = item
+        historyMsg.unshift(msg)
+        if (msg) {
+          msg.fromSelf = msg.sender == this.userData.userid
+          msg.showTime = true
 
-                  const firstMsg = this.historyList[0]
-                  if (firstMsg && firstMsg.sendTime - msg.sendTime < 2 * 60 * 1000) {
-                    firstMsg.showTime = false
-                  }
-                  this.historyList.unshift(msg)
-                }
-              })
+          const firstMsg = this.historyList[0]
+          if (firstMsg && firstMsg.sendtime - msg.sendtime < 2 * 60 * 1000) {
+            firstMsg.showTime = false
+          }
+          this.historyList.unshift(msg)
+        }
+      })
+      resolve()
       setTimeout(() => {
         containerElem.scrollTop = containerElem.scrollHeight - scrollBottom - 40
       }, 0)
@@ -480,6 +474,8 @@ export default {
   beforeRouteLeave (to, from, next) {
     this.clearChatlist()
     this.getActiveId({activeId: null})
+    this.closeExtensionArea()
+    this.hasMoreHistory = true
     next()
   },
   watch: {

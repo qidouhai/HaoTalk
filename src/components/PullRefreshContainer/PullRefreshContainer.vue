@@ -168,12 +168,6 @@ export default {
     }
   },
   mounted () {
-    // const options = supportPassive
-    //   ? {
-    //     passive: false,
-    //     capture: true
-    //   }
-    //   : true
     const container = document.querySelector('.pull-refresh-container')
     container.addEventListener('touchstart', this.touchStart, true)
     container.addEventListener('touchmove', this.touchMove, true)

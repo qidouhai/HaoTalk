@@ -1,17 +1,15 @@
 <template>
   <mu-bottom-nav :value="bottomNav" @change="handleChange" class="bottom-tab">
-    <mu-badge circle color="secondary" content="0" class="badge" >
-      <mu-bottom-nav-item value="消息" title="消息" icon="chat_bubble_outline" replace to="/message"/>
-    </mu-badge>
-    <mu-badge circle color="secondary" content="1" class="badge">
-      <mu-bottom-nav-item value="朋友" title="朋友" icon="people" replace to="/friends"/>
-    </mu-badge>
-    <mu-badge circle color="secondary" content="1" class="badge">
-      <mu-bottom-nav-item value="发现" title="动态" icon="explore" replace to="/discover"/>
-    </mu-badge>
+    <mu-bottom-nav-item value="消息" title="消息" icon="chat_bubble_outline" replace to="/message"/>
+    <mu-badge v-show="newbadges[0]!='0'" circle color="secondary" :content="newbadges[0]" class="badge" ></mu-badge>
+    <mu-bottom-nav-item value="朋友" title="朋友" icon="people" replace to="/friends"/>
+    <mu-badge v-show="newbadges[0]!='0'" circle color="secondary" :content="newbadges[1]" class="badge"></mu-badge>
+    <mu-bottom-nav-item value="发现" title="动态" icon="explore" replace to="/discover"/>
+    <mu-badge v-show="newbadges[0]!='0'" circle color="secondary" :content="newbadges[2]" class="badge"></mu-badge>
   </mu-bottom-nav>
 </template>
 <script>
+import { mapState, mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'bottomTab',
   data () {
@@ -20,6 +18,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      newbadges: state => state.newsNum.map(item => { return String(item) })
+    })
   },
   methods: {
     // 点击按钮
@@ -39,13 +40,17 @@ export default {
   width: 100%
   height: 100%
   .badge
-    width: 33.3%
+    position absolute
+    top 0
+    &:nth-of-type(1)
+      left 25%
+    &:nth-of-type(2)
+      left 56%
+    &:nth-of-type(3)
+      left 90%
     .mu-bottom-item
       display block
       width 100%
       height 100%
       font-size 15px
-/deep/.badge em
-    top 0
-    right 20px
 </style>

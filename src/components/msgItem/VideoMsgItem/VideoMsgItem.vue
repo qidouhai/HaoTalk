@@ -9,7 +9,7 @@
 </template>
 
 <script>
-
+import INDEXDB from '../../../libs/indexDB'
 export default {
   name: 'video-msg-item',
   props: ['context'],
@@ -18,11 +18,14 @@ export default {
   },
   computed: {
     imgUrl () {
-      const [videoString, videoCoverString] = this.context.context && this.context.context.split('|')
+      const videoCoverString = this.context.context
       return videoCoverString
     },
     videoUrl () {
-      const [videoString, videoCoverString] = this.context.context && this.context.context.split('|')
+      var videoString
+      INDEXDB.getItem(this.context.sender + this.context.sendtime, (res) => {
+        videoString = res
+      })
       return videoString
     }
   },

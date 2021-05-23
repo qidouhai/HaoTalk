@@ -118,3 +118,4 @@ export function updateIdList (list) {
   oldlist = [...new Set(oldlist)]
   localStorage.setItem('idList', JSON.stringify(oldlist))
 }
+

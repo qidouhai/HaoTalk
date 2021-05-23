@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { http } from '../libs/http'
 import { updateIdList } from '../libs/utils'
+import INDEXDB from '../libs/indexDB'
 
 Vue.use(Vuex)
 
@@ -24,7 +25,8 @@ export default new Vuex.Store({
     headerTitle: '消息',
     isAjax: true,
     activeId: '',
-    chatList: []// 当前消息
+    chatList: [], // 当前消息
+    newsNum: [0, 0, 0]
   },
   getters: {
     nowFriendList: (state) => {
@@ -51,13 +53,17 @@ export default new Vuex.Store({
       if (state.activeId == null) {
         return []
       }
-      let list = state.messageList.filter(item => {
+      let target = state.messageList.filter(item => {
         return item.uid == state.activeId
-      })[0].list
-      list.forEach(data => {
-        data.fromSelf = data.sender == state.userdata.userid
       })
-      return list
+      if (target.length) {
+        target[0].list.forEach(data => {
+          data.fromSelf = data.sender == state.userdata.userid
+        })
+      } else {
+        return []
+      }
+      return target[0].list
     },
     nowGroupList: (state) => {
       return state.groupList.map(item => {
@@ -84,14 +90,18 @@ export default new Vuex.Store({
     getActiveId: (state, {activeId}) => {
       state.activeId = activeId
     },
-    removeMessage: (state, {_id}) => {
-      state.messageList.forEach((item, index, arr) => {
-        if (item._id === _id) {
-          arr.splice(index, 1)
-        }
-      })
+    removeMessage: (state, {index}) => {
+      state.messageList.splice(index, 1)
     },
     updateMessageList: (state, msg) => {
+      msg.forEach(item => {
+        item.list.forEach(data => {
+          if (data.contexttype == 'audio') {
+            INDEXDB.setItem(data.sender + data.sendtime, data.context)
+          }
+          data.context = data.context.split('|')[0]
+        })
+      })
       state.messageList = msg
       state.isAjax = true
     },
@@ -185,6 +195,10 @@ export default new Vuex.Store({
       console.log('获取个人信息', res)
     },
     SOCKET_MESSAGE (context, data) {
+      if (data.contexttype == 'audio') {
+        INDEXDB.setItem(data.sender + data.sendtime, data.context)
+        data.context = data.context.split('|')[0]
+      }
       if (data.sender == context.state.activeId || data.receiver == context.state.activeId) {
         if (data.sender == context.state.userdata.userid) return
         context.commit('addToChatlist', data)

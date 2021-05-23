@@ -26,7 +26,7 @@
           <mu-badge :content="`${item.list.length}`" color='#f44336' />
         </div>
       </mu-list-item>
-      <div class="delete" @click.stop="removeM(item._id)">删除</div>
+      <div class="delete" @click.stop="removeM(index)">删除</div>
     </div>
   </mu-list>
 </template>
@@ -67,8 +67,9 @@ export default {
       this.$router.push({path: `/dialog/${id}`})
     },
     // 删除信息
-    removeM (_id) {
-      this.removeMessage({ _id })
+    removeM (index) {
+
+      this.removeMessage({ index })
     }
   },
   filters: {
@@ -150,7 +151,7 @@ export default {
             y = e.changedTouches[0].pageY
             swipeX = true
             swipeY = true
-            //  element.classList.remove('swipeleft')
+            element.classList.remove('swipeleft')
           }, true)
           element.addEventListener('touchmove', e => {
             X = e.changedTouches[0].pageX
