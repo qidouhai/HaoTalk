@@ -63,7 +63,7 @@
       <mu-tab v-else>
         送礼物
       </mu-tab>
-      <mu-tab @click="showDialog">
+      <mu-tab @click="goDialog">
         发消息
       </mu-tab>
     </mu-tabs>
@@ -78,6 +78,7 @@
 <script>
 
 import { http } from '../../libs/http'
+import {addIdList} from '../../libs/utils'
 export default {
   name: 'personindex',
   data () {
@@ -109,7 +110,26 @@ export default {
     back () {
       this.$router.go(-1)
     },
-    showDialog () {
+    goDialog () {
+      let roomid = this.$route.params.uid
+      let target = this.$store.state.messageList.filter(item => {
+        return item.uid == roomid
+      })
+      if (!target.length) {
+        var res = roomid.startsWith('x')
+          ? this.$store.state.groupList.find(item => { return item.roomid == roomid })
+          : this.$store.state.friendList.find(item => { return item.friendid == roomid })
+        let data = {
+          avatar: res.avatar,
+          name: roomid.startsWith('x') ? res.roomname : res.username,
+          list: [],
+          uid: roomid.startsWith('x') ? res.roomid : res.friendid,
+          creater: roomid.startsWith('x') ? res.creater : null,
+          littlename: roomid.startsWith('x') ? null : res.littlename
+        }
+        this.$store.commit('increaseMessagelist', data)
+      }
+      addIdList(this.$route.params.uid)
       this.$router.replace({path: `/dialog/${this.$route.params.uid}`})
     },
     showEditinfo () {
@@ -126,9 +146,9 @@ export default {
   },
   watch: {
     // 监听路由
-    $route () {
+    $route (to, from) {
       if (this.$route.params.uid !== null) {
-        this.paramId = this.$route.params.uid
+        if (to.path.startsWith('/personinfo')) { this.paramId = this.$route.params.uid }
       }
     },
     paramId (newVal, oldVal) {

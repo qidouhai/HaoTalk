@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { http } from '../libs/http'
-import { updateIdList } from '../libs/utils'
 import INDEXDB from '../libs/indexDB'
 
 Vue.use(Vuex)
@@ -23,12 +22,23 @@ export default new Vuex.Store({
     groupList: [],
     sidebar: false,
     headerTitle: '消息',
-    isAjax: true,
     activeId: '',
-    chatList: [], // 当前消息
-    newsNum: [0, 0, 0]
+    chatList: []// 当前消息
   },
   getters: {
+    newmsgNum: (state) => {
+      let res = 0
+      state.messageList.forEach(item => {
+        res += item.newsnum
+      })
+      return String(res)
+    },
+    newfriendNum: (state) => {
+      return '0'
+    },
+    newdiscoverNum: (state) => {
+      return '0'
+    },
     nowFriendList: (state) => {
       return state.friendList.map(item => {
         return {...item, avatar: item.avatar || 'static/images/avatar.jpg', name: item.username || '用户' + item.friendid}
@@ -105,15 +115,14 @@ export default new Vuex.Store({
       state.messageList = msg
       state.isAjax = true
     },
+    increaseMessagelist: (state, msg) => {
+      state.messageList.unshift(msg)
+    },
     updateFriendList: (state, data) => {
       state.friendList = data
-      let idList = state.friendList.map(item => { return item.friendid })
-      updateIdList(idList)
     },
     updateGroupList: (state, data) => {
       state.groupList = data
-      let idList = state.groupList.map(item => { return item.roomid })
-      updateIdList(idList)
     },
     updateUserData: (state, data) => {
       state.userdata = data[0]
@@ -130,7 +139,7 @@ export default new Vuex.Store({
       })
       if (target) {
         target.list.push(data)
-        target.list.splice(0, target.list.length - 10)
+        target.newsnum == null ? target.newsnum = 1 : target.newsnum += 1
       } else {
         var res = data.receiver.startsWith('x')
           ? state.groupList.find(item => { return item.roomid == data.receiver })
@@ -141,7 +150,8 @@ export default new Vuex.Store({
           list: [data],
           uid: data.receiver.startsWith('x') ? res.roomid : res.friendid,
           creater: data.receiver.startsWith('x') ? res.creater : null,
-          littlename: data.receiver.startsWith('x') ? null : res.littlename
+          littlename: data.receiver.startsWith('x') ? null : res.littlename,
+          newsnum: 1
         })
       }
     },

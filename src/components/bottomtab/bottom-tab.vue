@@ -1,11 +1,11 @@
 <template>
   <mu-bottom-nav :value="bottomNav" @change="handleChange" class="bottom-tab">
     <mu-bottom-nav-item value="消息" title="消息" icon="chat_bubble_outline" replace to="/message"/>
-    <mu-badge v-show="newbadges[0]!='0'" circle color="secondary" :content="newbadges[0]" class="badge" ></mu-badge>
+    <mu-badge v-show="newmsgNum!='0'" circle color="secondary" :content="newmsgNum" class="badge" ></mu-badge>
     <mu-bottom-nav-item value="朋友" title="朋友" icon="people" replace to="/friends"/>
-    <mu-badge v-show="newbadges[0]!='0'" circle color="secondary" :content="newbadges[1]" class="badge"></mu-badge>
+    <mu-badge v-show="newfriendNum!='0'" circle color="secondary" :content="newfriendNum" class="badge"></mu-badge>
     <mu-bottom-nav-item value="发现" title="动态" icon="explore" replace to="/discover"/>
-    <mu-badge v-show="newbadges[0]!='0'" circle color="secondary" :content="newbadges[2]" class="badge"></mu-badge>
+    <mu-badge v-show="newduscoverNum!='0'" circle color="secondary" :content="newduscoverNum" class="badge"></mu-badge>
   </mu-bottom-nav>
 </template>
 <script>
@@ -18,9 +18,7 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      newbadges: state => state.newsNum.map(item => { return String(item) })
-    })
+    ...mapGetters(['newmsgNum', 'newfriendNum', 'newduscoverNum'])
   },
   methods: {
     // 点击按钮

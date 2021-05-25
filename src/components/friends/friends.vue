@@ -107,7 +107,7 @@
         <mu-list>
           <!--动态渲染-->
           <div v-for="(item,index) in groups" class="item" :key="index">
-            <mu-list-item avatar button @click="showPersonindex(item.roomid)"
+            <mu-list-item avatar button @click="showGroupindex(item.roomid)"
                           :ripple="true">
               <mu-list-item-action>
                 <mu-avatar>
@@ -151,6 +151,10 @@ export default {
     showPersonindex (e) {
       this.$store.commit('getActiveId', { activeId: e })
       this.$router.push({path: `/personinfo/${e}`})
+    },
+    showGroupindex (e) {
+      this.$store.commit('getActiveId', { activeId: e })
+      this.$router.push({path: `/groupinfo/${e}`})
     }
   }
 }

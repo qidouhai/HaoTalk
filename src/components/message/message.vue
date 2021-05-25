@@ -1,6 +1,6 @@
 <template>
   <!--判定ajax结束后，且有消息列表存在才开始渲染组件，防止报错-->
-  <mu-list v-if="isAjax&&nowMessageList" >
+  <mu-list  class="msglist">
     <!--设置列表删除时动态效果-->
     <div v-for="(item, index) in nowMessageList" class="wrap"
          @click="openDialog(item.uid)"
@@ -18,12 +18,15 @@
           <mu-list-item-content>
           <mu-list-item-title>{{item.littlename||item.name}}</mu-list-item-title>
           <mu-list-item-sub-title>
-            <span v-show="isGroup" style="color: rgba(0, 0, 0, .87)">{{item.name}}</span>{{item.list[item.list.length-1]|showLastmsg}}
+            <span v-if="item.uid.startsWith('x')" style="color: rgba(0, 0, 0, .87);">
+              {{item.list[item.list.length-1].sendername+'：'}}
+            </span>
+            {{item.list[item.list.length-1]|showLastmsg}}
           </mu-list-item-sub-title>
           </mu-list-item-content>
         <div class="item-right">
-          <span class="time">{{item.list[item.list.length-1].sendtime|formattime}}</span>
-          <mu-badge :content="`${item.list.length}`" color='#f44336' />
+          <span class="time">{{item.list.length && item.list[item.list.length-1].sendtime|formattime}}</span>
+          <mu-badge v-if="item.newsnum" :content="`${item.newsnum}`" color='#f44336' />
         </div>
       </mu-list-item>
       <div class="delete" @click.stop="removeM(index)">删除</div>
@@ -31,8 +34,8 @@
   </mu-list>
 </template>
 <script>
-import { mapState, mapGetters, mapMutations } from 'vuex'
-import { timeFormat } from '../../libs/utils'
+import { mapGetters, mapMutations } from 'vuex'
+import { timeFormat, removeIdList } from '../../libs/utils'
 import VueSocketIO from 'vue-socket.io'
 import Vue from 'vue'
 import store from '../../vuex/index'
@@ -51,70 +54,14 @@ export default {
   name: 'message',
   data () {
     return {
-      isGroup: false
-    }
-  },
-  computed: {
-    ...mapGetters(['nowMessageList']),
-    // ajax是否已经结束
-    ...mapState(['isAjax'])
-  },
-  methods: {
-    ...mapMutations(['getActiveId', 'removeMessage']),
-    // 获取点击的friend的_id
-    openDialog (id) {
-      this.getActiveId({ activeId: id })
-      this.$router.push({path: `/dialog/${id}`})
-    },
-    // 删除信息
-    removeM (index) {
-
-      this.removeMessage({ index })
-    }
-  },
-  filters: {
-    formattime (time) {
-      let nowtime = Date.now()
-      let seconds = (nowtime - time) / 1000
-      var result
-      if (seconds < 300) {
-        result = '刚刚'
-      } else if (seconds >= 300 && seconds < 600) {
-        result = '五分钟前'
-      } else if (seconds >= 600 && seconds < 1800) {
-        result = '10分钟前'
-      } else if (seconds >= 1800 && seconds < 3600) {
-        result = '30分钟前'
-      } else if (seconds >= 3600 && seconds / 3600 / 24 < 7) {
-        if (seconds / 3600 / 24 < 1) {
-          result = timeFormat(time, 'hh:MM')
-        } else {
-          result = matchDay[new Date().getDay() + (7 - seconds / 3600 / 24)]
-        }
-      } else {
-        result = timeFormat(time, 'yyyy-mm-dd')
-      }
-      return result
-    },
-    showLastmsg (item) {
-      let name = ''
-      switch (item.contexttype) {
-        case 'text':
-          name = item.context
-          break
-        case 'video':
-          name = '【视频】'
-          break
-        case 'audio':
-          name = '【音频】'
-          break
-        case 'image':
-          name = '【图片】'
-          break
-        default:
-          break
-      }
-      return name
+      x: '',
+      y: '',
+      X: '',
+      Y: '',
+      swipeX: '',
+      swipeY: '',
+      oldEle: '',
+      nodeEle: ''
     }
   },
   async created () {
@@ -142,41 +89,111 @@ export default {
   mounted () {
     setTimeout(() => {
       // 判断是否存在信息列表
-      if (this.$refs.child) {
-        this.$refs.child.forEach((element, index) => {
-          let x, y, X, Y, swipeX, swipeY
-          // 监听touchstart
-          element.addEventListener('touchstart', e => {
-            x = e.changedTouches[0].pageX
-            y = e.changedTouches[0].pageY
-            swipeX = true
-            swipeY = true
-            element.classList.remove('swipeleft')
-          }, true)
-          element.addEventListener('touchmove', e => {
-            X = e.changedTouches[0].pageX
-            Y = e.changedTouches[0].pageY
-            if (swipeX && Math.abs(X - x) - Math.abs(Y - y) > 0) {
-              // 阻止默认事件
-              e.stopPropagation()
-              // 右滑
-              if (X - x > 10) {
-                e.preventDefault()
-                element.classList.remove('swipeleft')
-              }
-              if (x - X > 10) {
-                e.preventDefault()
-                element.classList.add('swipeleft')
-              }
-              swipeY = false
-            }
-            if (swipeY && Math.abs(X - x) - Math.abs(Y - y) < 0) {
-              swipeX = false
-            }
-          })
-        })
-      }
+      let msglist = document.getElementsByClassName('msglist')[0]
+      msglist.addEventListener('touchstart', e => {
+        this.oldEle && this.nodeEle.classList.remove('swipeleft')
+        this.nodeEle = this.findRootNode(e.target)
+        this.oldEle = this.nodeEle
+        this.x = e.changedTouches[0].pageX
+        this.y = e.changedTouches[0].pageY
+        this.swipeX = true
+        this.swipeY = true
+      })
+      msglist.addEventListener('touchmove', e => {
+        this.X = e.changedTouches[0].pageX
+        this.Y = e.changedTouches[0].pageY
+        if (this.swipeX && Math.abs(this.X - this.x) - Math.abs(this.Y - this.y) > 0) {
+          // 阻止默认事件
+          e.stopPropagation()
+          // 右滑
+          if (this.X - this.x > 10) {
+            e.preventDefault()
+            this.nodeEle.classList.remove('swipeleft')
+          }
+          if (this.x - this.X > 10) {
+            e.preventDefault()
+            this.nodeEle.classList.add('swipeleft')
+          }
+          this.swipeY = false
+        }
+        if (this.swipeY && Math.abs(this.X - this.x) - Math.abs(this.Y - this.y) < 0) {
+          this.swipeX = false
+        }
+      })
     }, 1000)
+  },
+  computed: {
+    ...mapGetters(['nowMessageList', 'nowFriendList'])
+  },
+  methods: {
+    ...mapMutations(['getActiveId', 'removeMessage']),
+    // 获取点击的friend的_id
+    openDialog (id) {
+      this.getActiveId({ activeId: id })
+      this.$router.push({path: `/dialog/${id}`})
+    },
+    // 删除信息
+    removeM (index) {
+      removeIdList(this.nowMessageList[index].uid)
+      this.removeMessage({ index })
+    },
+    findRootNode (node) {
+      if (node.classList.contains('wrap')) return node
+      else {
+        return this.findRootNode(node.parentNode)
+      }
+    }
+  },
+  filters: {
+    formattime (time) {
+      if (!time) return
+      let nowtime = Date.now()
+      let seconds = (nowtime - time) / 1000
+      var result
+      if (seconds < 300) {
+        result = '刚刚'
+      } else if (seconds >= 300 && seconds < 600) {
+        result = '五分钟前'
+      } else if (seconds >= 600 && seconds < 1800) {
+        result = '10分钟前'
+      } else if (seconds >= 1800 && seconds < 3600) {
+        result = '30分钟前'
+      } else if (seconds >= 3600 && seconds / 3600 / 24 < 7) {
+        if (seconds / 3600 / 24 < 1) {
+          result = timeFormat(time, 'hh:MM')
+        } else {
+          result = matchDay[new Date().getDay() + (7 - seconds / 3600 / 24)]
+        }
+      } else {
+        result = timeFormat(time, 'yyyy-mm-dd')
+      }
+      return result
+    },
+    showLastmsg (item) {
+      if (!item) return
+      let name = ''
+      switch (item.contexttype) {
+        case 'text':
+          name = item.context
+          break
+        case 'video':
+          name = '【视频】'
+          break
+        case 'audio':
+          name = '【音频】'
+          break
+        case 'image':
+          name = '【图片】'
+          break
+        default:
+          break
+      }
+      return name
+    }
+  },
+  beforeRouteLeave (to, from, next) {
+    this.nodeEle && this.nodeEle.classList.remove('swipeleft')
+    next()
   }
 }
 </script>

@@ -108,15 +108,24 @@ export function getVideoCover (data) {
   })
 }
 
-export function updateIdList (list) {
-  let oldlist = JSON.parse(localStorage.getItem('idList'))
-  if (!oldlist) {
-    localStorage.setItem('idList', JSON.stringify(list))
+export function addIdList (id) {
+  let list = JSON.parse(localStorage.getItem('idList'))
+  if (!list) {
+    localStorage.setItem('idList', JSON.stringify([id]))
     return
   }
-  oldlist.push(...list)
-  oldlist = [...new Set(oldlist)]
-  localStorage.setItem('idList', JSON.stringify(oldlist))
+  list.push(id)
+  let newlist = [...new Set(list)]
+  localStorage.setItem('idList', JSON.stringify(newlist))
+}
+
+export function removeIdList (id) {
+  let list = JSON.parse(localStorage.getItem('idList'))
+  if (!list) {
+    return
+  }
+  list.splice(list.findIndex(item => { return item == id }), 1)
+  localStorage.setItem('idList', JSON.stringify(list))
 }
 
 export function deepcopy (obj) {

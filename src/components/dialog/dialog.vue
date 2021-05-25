@@ -117,7 +117,6 @@
     <div
       v-show="messageTipFlag || messageScrollFlag"
       class="new-message-tip"
-      :class="{ shorter: messageScrollFlag && !messageTipFlag }"
       @click="scrollToBottom"
     >
       <img src="../../assets/double_triangle_down.png" />
@@ -544,6 +543,28 @@ export default {
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
+  .new-message-tip {
+    position: absolute;
+    right: 0;
+    margin-left: -95 * $px;
+    padding: 10 * $px 20 * $px;
+    text-align: center;
+    background-color: #111;
+    opacity: 0.7;
+    border-radius: 30 * $px;
+    img {
+      float: left;
+      width: 50 * $px;
+      height: 50 * $px;
+      margin-top: 15 * $px;
+      margin-right: 10 * $px;
+    }
+    span {
+      float: right;
+      font-size: 24 * $px;
+      color: #fff;
+    }
+  }
   .mu-appbar
     position: relative
     top: 0
