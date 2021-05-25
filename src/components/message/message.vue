@@ -3,7 +3,7 @@
   <mu-list  class="msglist">
     <!--设置列表删除时动态效果-->
     <div v-for="(item, index) in nowMessageList" class="wrap"
-         @click="openDialog(item.uid)"
+         @click="openDialog(item)"
          ref="child"
          :key="index">
       <mu-list-item :ripple="true"
@@ -128,9 +128,10 @@ export default {
   methods: {
     ...mapMutations(['getActiveId', 'removeMessage']),
     // 获取点击的friend的_id
-    openDialog (id) {
-      this.getActiveId({ activeId: id })
-      this.$router.push({path: `/dialog/${id}`})
+    openDialog (item) {
+      item.newsnum = 0
+      this.getActiveId({ activeId: item.uid })
+      this.$router.push({path: `/dialog/${item.uid}`})
     },
     // 删除信息
     removeM (index) {
