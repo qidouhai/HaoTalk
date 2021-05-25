@@ -214,6 +214,7 @@ export default {
       msg.sendtime = Date.now()
       msg.msgtype = 'CONVERSATION_NOTE'
       msg.sender = this.userData.userid
+      msg.sendername = this.userData.username
       msg.avatar = this.userData.avatar
       msg.receiver = this.$store.state.activeId
       msg.isSending = true

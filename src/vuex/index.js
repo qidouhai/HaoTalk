@@ -29,7 +29,7 @@ export default new Vuex.Store({
     newmsgNum: (state) => {
       let res = 0
       state.messageList.forEach(item => {
-        res += item.newsnum
+        res += item.newsnum == null ? 0 : item.newsnum
       })
       return String(res)
     },
@@ -91,6 +91,11 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    removeNewmsgnum: (state, uid) => {
+      state.messageList.forEach(item => {
+        if (item.uid == uid) { item.newsnum = 0 }
+      })
+    },
     showSidebar: (state, {flag} = {}) => {
       state.sidebar = !state.sidebar
     },

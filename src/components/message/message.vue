@@ -19,7 +19,7 @@
           <mu-list-item-title>{{item.littlename||item.name}}</mu-list-item-title>
           <mu-list-item-sub-title>
             <span v-if="item.uid.startsWith('x')" style="color: rgba(0, 0, 0, .87);">
-              {{item.list[item.list.length-1].sendername+'：'}}
+              {{item.list[item.list.length-1].sendername+': '}}
             </span>
             {{item.list[item.list.length-1]|showLastmsg}}
           </mu-list-item-sub-title>
@@ -129,7 +129,7 @@ export default {
     ...mapMutations(['getActiveId', 'removeMessage']),
     // 获取点击的friend的_id
     openDialog (item) {
-      item.newsnum = 0
+      this.$store.commit('removeNewmsgnum', item.uid)
       this.getActiveId({ activeId: item.uid })
       this.$router.push({path: `/dialog/${item.uid}`})
     },
