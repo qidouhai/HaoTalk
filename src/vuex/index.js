@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { http } from '../libs/http'
 import INDEXDB from '../libs/indexDB'
+import { addIdList } from '../libs/utils'
 
 Vue.use(Vuex)
 
@@ -110,6 +111,7 @@ export default new Vuex.Store({
     },
     updateMessageList: (state, msg) => {
       msg.forEach(item => {
+        item.newsnum = 0
         item.list.forEach(data => {
           if (data.contexttype == 'video') {
             INDEXDB.setItem(data.sender + data.sendtime, data.context.split('|')[0])
@@ -118,7 +120,6 @@ export default new Vuex.Store({
         })
       })
       state.messageList = msg
-      state.isAjax = true
     },
     increaseMessagelist: (state, msg) => {
       state.messageList.unshift(msg)
@@ -146,6 +147,7 @@ export default new Vuex.Store({
         target.list.push(data)
         target.newsnum == null ? target.newsnum = 1 : target.newsnum += 1
       } else {
+        data.receiver.startsWith('x') ? addIdList(data.receiver) : addIdList(data.sender)
         var res = data.receiver.startsWith('x')
           ? state.groupList.find(item => { return item.roomid == data.receiver })
           : state.friendList.find(item => { return item.friendid == data.sender })

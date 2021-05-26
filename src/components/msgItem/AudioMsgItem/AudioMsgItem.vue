@@ -3,8 +3,11 @@
     '--showright':context.fromSelf?'visible':'hidden','background':context.fromSelf?'#43ad7f7f':'#F5F5DC'}" >
         <audio :src="context.context" ref="audio" style="display:none"></audio>
         <div class="self__audio">
-            <div class="audio__duration">{{duration}}"</div>
-            <div class="audio__trigger" @click="playAudioHandler">
+            <div class="audio__duration"
+            :style="{'--showleft':context.fromSelf?'left':'right'}">{{duration}}"</div>
+            <div class="audio__trigger" @click="playAudioHandler"
+            :style="{'--showreverse':context.fromSelf?'none':'scaleX(-1) ',
+                     '--showleft':context.fromSelf?'right':'left'}">
                 <div
                 :class="{
                     'wifi-symbol':true,

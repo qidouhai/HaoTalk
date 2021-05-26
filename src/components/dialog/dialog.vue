@@ -485,6 +485,7 @@ export default {
     this.getActiveId({activeId: null})
     this.closeExtensionArea()
     this.hasMoreHistory = true
+    this.showVideoPlayer = false
     next()
   },
   watch: {

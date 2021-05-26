@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div v-show="show" class="videoMask" @click="hideVideo">
+    <div v-show="show" class="videoMask">
       <video
-        v-if="displayVideoElem"
         ref="videoPlayer"
         class="video"
         webkit-playsinline
@@ -14,7 +13,20 @@
         x5-video-player-fullscreen="true"
         @play="getWidthAndHeight"
         @canplaythrough="getWidthAndHeight"
-      />
+        @playing="showClose"
+        @pause="showClose"
+        @click="showClose"
+      ></video>
+      <div class="control" v-show="showControl">
+        <mu-appbar style="width: 100%;" color="black">
+          <mu-button icon slot="left" @click="hideVideo">
+            <mu-icon value="clear"></mu-icon>
+          </mu-button>
+          <mu-button flat slot="right">
+            <mu-icon value="menu"></mu-icon>
+          </mu-button>
+        </mu-appbar>
+      </div>
     </div>
   </div>
 </template>
@@ -39,13 +51,11 @@ export default {
   data () {
     return {
       curVideoUrl: '',
-      playPromise: null
+      playPromise: null,
+      showControl: true
     }
   },
   computed: {
-    displayVideoElem () {
-      return true
-    }
   },
   watch: {
     show (newValue) {
@@ -59,6 +69,9 @@ export default {
       const pre = this.curVideoUrl.substring(this.curVideoUrl.length - 8)
       const now = this.videoUrl.substring(this.videoUrl.length - 8)
       return pre !== now
+    },
+    showClose () {
+      this.showControl = !this.showControl
     },
     showVideo () {
       const playUrl = this.videoUrl
@@ -110,7 +123,7 @@ export default {
 </script>
 <style scoped lang="stylus">
 $px = 1 / 75rem;
-  .videoMask {
+  .videoMask
     position: fixed;
     display: flex;
     display: -webkit-flex;
@@ -125,8 +138,10 @@ $px = 1 / 75rem;
     height: 100vh;
     z-index: 100000;
     background-color: rgba(0, 0, 0, 0.9);
-    .video {
+    .video
       width: 100%;
-    }
-  }
+    .control
+      position absolute
+      top 0
+      width 100%
 </style>

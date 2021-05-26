@@ -25,13 +25,17 @@ $px = 1 / 30rem;
     border: 10px solid transparent
     border-right-color:#F5F5DC
   .self__audio 
+    overflow: hidden
     .audio__duration 
+      float: var(--showleft)
       display: inline-block;
       line-height: 32px;
       height: 32px;
       padding-right: 6px;
       color: #888888;
-    .audio__trigger 
+    .audio__trigger
+      float: var(--showleft) 
+      transform: var(--showreverse)
       cursor: pointer;
       vertical-align: top;
       display: inline-block;
