@@ -72,11 +72,11 @@
         加好友
       </mu-tab>
     </mu-tabs>
-    <router-view></router-view>
+    <editinfo v-show="showEdit" :personData="userData" @backclick="closeEditinfo"></editinfo>
   </div>
 </template>
 <script>
-
+import editinfo from './editinfo.vue'
 import { http } from '../../libs/http'
 import {addIdList} from '../../libs/utils'
 export default {
@@ -85,8 +85,12 @@ export default {
     return {
       activeTab: 'tab1',
       userData: {},
-      paramId: ''
+      paramId: '',
+      showEdit: false
     }
+  },
+  components: {
+    editinfo
   },
   created () {
     this.$nextTick(() => {
@@ -111,21 +115,18 @@ export default {
       this.$router.go(-1)
     },
     goDialog () {
-      let roomid = this.$route.params.uid
+      let personid = this.$route.params.uid
       let target = this.$store.state.messageList.filter(item => {
-        return item.uid == roomid
+        return item.uid == personid
       })
       if (!target.length) {
-        var res = roomid.startsWith('x')
-          ? this.$store.state.groupList.find(item => { return item.roomid == roomid })
-          : this.$store.state.friendList.find(item => { return item.friendid == roomid })
+        let res = this.$store.state.friendList.find(item => { return item.friendid == personid })
         let data = {
           avatar: res.avatar,
-          name: roomid.startsWith('x') ? res.roomname : res.username,
+          name: res.username,
           list: [],
-          uid: roomid.startsWith('x') ? res.roomid : res.friendid,
-          creater: roomid.startsWith('x') ? res.creater : null,
-          littlename: roomid.startsWith('x') ? null : res.littlename
+          uid: res.friendid,
+          littlename: res.littlename
         }
         this.$store.commit('increaseMessagelist', data)
       }
@@ -133,7 +134,11 @@ export default {
       this.$router.replace({path: `/dialog/${this.$route.params.uid}`})
     },
     showEditinfo () {
-      this.$router.push({path: `/personinfo/${this.$route.params.uid}/editinfo`})
+      this.showEdit = !this.showEdit
+    },
+    async closeEditinfo () {
+      await this.init()
+      this.showEdit = !this.showEdit
     },
     async init () {
       const res = await http('/getuserdata', {

@@ -1,5 +1,5 @@
 <template>
-   <div class="audio-msg-content" :style="{'--showleft':context.fromSelf?'hidden':'visible',
+   <div ref="audioCop" class="audio-msg-content" :style="{'--showleft':context.fromSelf?'hidden':'visible',
     '--showright':context.fromSelf?'visible':'hidden','background':context.fromSelf?'#43ad7f7f':'#F5F5DC'}" >
         <audio :src="context.context" ref="audio" style="display:none"></audio>
         <div class="self__audio">
@@ -35,10 +35,12 @@ export default({
   },
   methods: {
     playAudioHandler () {
+      this.$emit('audio-clicked', this)
       this.isPlaying = !this.isPlaying
       const player = this.$refs.audio
       if (this.isPlaying) {
         // player.load()
+        player.currentTime = 0
         player.play()
       } else {
         player.pause()

@@ -19,9 +19,9 @@
           <mu-list-item-title>{{item.littlename||item.name}}</mu-list-item-title>
           <mu-list-item-sub-title>
             <span v-if="item.uid.startsWith('x')" style="color: rgba(0, 0, 0, .87);">
-              {{item.list[item.list.length-1].sendername+': '}}
+              {{item.list.length?item.list[item.list.length-1].sendername+': ':null}}
             </span>
-            {{item.list[item.list.length-1]|showLastmsg}}
+            {{item.list.length&&item.list[item.list.length-1]|showLastmsg}}
           </mu-list-item-sub-title>
           </mu-list-item-content>
         <div class="item-right">
@@ -87,40 +87,37 @@ export default {
     }))
   },
   mounted () {
-    setTimeout(() => {
-      // 判断是否存在信息列表
-      let msglist = document.getElementsByClassName('msglist')[0]
-      msglist.addEventListener('touchstart', e => {
-        this.oldEle && this.nodeEle.classList.remove('swipeleft')
-        this.nodeEle = this.findRootNode(e.target)
-        this.oldEle = this.nodeEle
-        this.x = e.changedTouches[0].pageX
-        this.y = e.changedTouches[0].pageY
-        this.swipeX = true
-        this.swipeY = true
-      })
-      msglist.addEventListener('touchmove', e => {
-        this.X = e.changedTouches[0].pageX
-        this.Y = e.changedTouches[0].pageY
-        if (this.swipeX && Math.abs(this.X - this.x) - Math.abs(this.Y - this.y) > 0) {
-          // 阻止默认事件
-          e.stopPropagation()
-          // 右滑
-          if (this.X - this.x > 10) {
-            e.preventDefault()
-            this.nodeEle.classList.remove('swipeleft')
-          }
-          if (this.x - this.X > 10) {
-            e.preventDefault()
-            this.nodeEle.classList.add('swipeleft')
-          }
-          this.swipeY = false
+    let msglist = document.getElementsByClassName('msglist')[0]
+    msglist.addEventListener('touchstart', e => {
+      this.oldEle && this.nodeEle.classList.remove('swipeleft')
+      this.nodeEle = this.findRootNode(e.target)
+      this.oldEle = this.nodeEle
+      this.x = e.changedTouches[0].pageX
+      this.y = e.changedTouches[0].pageY
+      this.swipeX = true
+      this.swipeY = true
+    })
+    msglist.addEventListener('touchmove', e => {
+      this.X = e.changedTouches[0].pageX
+      this.Y = e.changedTouches[0].pageY
+      if (this.swipeX && Math.abs(this.X - this.x) - Math.abs(this.Y - this.y) > 0) {
+        // 阻止默认事件
+        e.stopPropagation()
+        // 右滑
+        if (this.X - this.x > 10) {
+          e.preventDefault()
+          this.nodeEle.classList.remove('swipeleft')
         }
-        if (this.swipeY && Math.abs(this.X - this.x) - Math.abs(this.Y - this.y) < 0) {
-          this.swipeX = false
+        if (this.x - this.X > 10) {
+          e.preventDefault()
+          this.nodeEle.classList.add('swipeleft')
         }
-      })
-    }, 1000)
+        this.swipeY = false
+      }
+      if (this.swipeY && Math.abs(this.X - this.x) - Math.abs(this.Y - this.y) < 0) {
+        this.swipeX = false
+      }
+    })
   },
   computed: {
     ...mapGetters(['nowMessageList', 'nowFriendList'])

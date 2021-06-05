@@ -96,6 +96,7 @@ const address = {
 }
 export default {
   name: 'editinfo',
+  props: ['personData'],
   data () {
     return {
       usernameRules: [
@@ -104,15 +105,6 @@ export default {
         {validate: (val) => val.trim().indexOf(' ') === -1,
           message: '不能包含空格'}
       ],
-      validateForm: {
-        avatar: '',
-        motto: '',
-        username: '',
-        address: '',
-        birthday: '',
-        introduction: '',
-        phone: ''
-      },
       addressSlots: [
         {
           width: '100%',
@@ -129,7 +121,13 @@ export default {
       addressProvince: '北京',
       addressCity: '北京',
       showAddpicker: false,
-      showTimepicker: false
+      showTimepicker: false,
+      validateForm: this.personData
+    }
+  },
+  watch: {
+    personData (newVal, oldVal) {
+      this.validateForm = newVal
     }
   },
   methods: {
@@ -164,7 +162,7 @@ export default {
       this.$refs.avatar.click()
     },
     back () {
-      this.$router.go(-1)
+      this.$emit('backclick')
     },
     closeSimpleDialog () {
       if (this.showAddpicker) {

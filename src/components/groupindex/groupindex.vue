@@ -8,7 +8,7 @@
     <mu-button flat slot="right">完成</mu-button>
   </mu-appbar>
   <mu-list>
-    <mu-list-item avatar button :ripple="true" @click="openDialog">
+    <mu-list-item avatar button :ripple="true" @click="showeditGroup">
       <mu-list-item-action>
           <mu-avatar>
               <img :src="groupData.avatar">
@@ -16,11 +16,12 @@
       </mu-list-item-action>
       <mu-list-item-title>{{groupData.roomname}}</mu-list-item-title>
       <mu-list-item-action >
-          <mu-icon value="chat_bubble"></mu-icon>
+          <mu-icon value="keyboard_arrow_right"></mu-icon>
       </mu-list-item-action>
     </mu-list-item>
   </mu-list>
-
+  <span>群公告</span>
+  <mu-text-field class="poster" disabled v-model="groupData.poster" multi-line :rows="3" ></mu-text-field>
   <mu-expansion-panel>
     <div slot="header">群聊成员</div>
     <mu-list>
@@ -41,16 +42,23 @@
   <mu-button full-width color="primary" @click="openDialog" class="create-button">发消息</mu-button>
   <mu-button v-if="isCreater" full-width color="primary" @click="destroyroom" class="create-button">解散群聊</mu-button>
   <mu-button v-else full-width color="primary" @click="quitroom" class="create-button">退出群聊</mu-button>
+  <editgroup v-show="showEdit" :oldData="groupData" @backclick="editClose"></editgroup>
 </div>
 </template>
 <script>
+import editgroup from './editgroup.vue'
 import { http } from '../../libs/http'
+import { addIdList } from '../../libs/utils'
 export default {
   name: 'groupindex',
+  components: {
+    editgroup
+  },
   data () {
     return {
       groupData: {},
-      paramId: ''
+      paramId: '',
+      showEdit: false
     }
   },
   created () {
@@ -76,7 +84,31 @@ export default {
     quitroom () {
 
     },
+    showeditGroup () {
+      if (!this.isCreater) return
+      this.showEdit = !this.showEdit
+    },
+    async editClose () {
+      await this.init()
+      this.showEdit = !this.showEdit
+    },
     openDialog () {
+      let roomid = this.$route.params.uid
+      let target = this.$store.state.messageList.filter(item => {
+        return item.uid == roomid
+      })
+      if (!target.length) {
+        let res = this.$store.state.groupList.find(item => { return item.roomid == roomid })
+        let data = {
+          avatar: res.avatar,
+          name: res.roomname,
+          list: [],
+          uid: res.roomid,
+          creater: res.creater
+        }
+        this.$store.commit('increaseMessagelist', data)
+      }
+      addIdList(this.$route.params.uid)
       this.$router.replace({path: `/dialog/${this.$route.params.uid}`})
     },
     async init () {
@@ -114,4 +146,8 @@ export default {
     width: 100%
     height: 100%
     background: white
+    .poster
+      width 100%
+      margin-bottom 0
+      padding-bottom 0
 </style>

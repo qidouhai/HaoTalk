@@ -41,6 +41,7 @@
           :context="item"
           @img-clicked="picClicked"
           @video-clicked="videoClicked"
+          @audio-clicked="audioClicked"
         >
         </component>
       </msg-item-base>
@@ -61,6 +62,7 @@
           @loaded="scrollToBottom"
           @img-clicked="picClicked"
           @video-clicked="videoClicked"
+          @audio-clicked="audioClicked"
         >
         </component>
       </msg-item-base>
@@ -172,7 +174,8 @@ export default {
       curVideoString: '',
       historyPageNo: 1,
       progressBar: 0,
-      bigPicUrl: ''
+      bigPicUrl: '',
+      audioComponent: null // 上一个音频播放组件
     }
   },
   mounted () {
@@ -418,7 +421,11 @@ export default {
       this.showVideoPlayer = true
       this.curVideoString = videoUrl
     },
-    // 点击图片
+    audioClicked (e) {
+      console.log('音频点击', e)
+      this.audioComponent && this.audioComponent.playAudioHandler()
+      this.audioComponent = e
+    },
     picClicked (item) {
       this.bigPicUrl = item
       this.isBigPicsVisible = true

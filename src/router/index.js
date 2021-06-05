@@ -6,7 +6,6 @@ import discover from '../components/discover/discover.vue'
 import Login from '../Login.vue'
 import chatWindow from '../components/dialog/dialog.vue'
 import personinfo from '../components/personindex/personindex.vue'
-import editinfo from '../components/personindex/editinfo.vue'
 import search from '../components/search/search.vue'
 import groupinfo from '../components/groupindex/groupindex.vue'
 
@@ -50,14 +49,7 @@ const router = new Router({
     {
       path: '/personinfo/:uid',
       name: 'personinfo',
-      component: personinfo,
-      children: [
-        {
-          path: 'editinfo',
-          name: 'editinfo',
-          component: editinfo
-        }
-      ]
+      component: personinfo
     },
     {
       path: '/groupinfo/:uid',
