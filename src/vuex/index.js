@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import { http } from '../libs/http'
 import INDEXDB from '../libs/indexDB'
 import { addIdList } from '../libs/utils'
-
+/* eslint-disable eqeqeq */
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -137,7 +137,6 @@ export default new Vuex.Store({
       state.chatList.push(data)
     },
     addToMessagelist: (state, data) => {
-      if (data.sender == state.userdata.userid) return
       let target = state.messageList.find(item => {
         if (data.receiver.startsWith('x')) {
           return item.uid == data.receiver
@@ -223,5 +222,17 @@ export default new Vuex.Store({
         context.commit('addToMessagelist', data)
       }
     }
+    /* SOCKET_OFFLINEMSG (context, data) {
+      if (data.contexttype == 'video') {
+        INDEXDB.setItem(data.sender + data.sendtime, data.context.split('|')[0])
+        data.context = data.context.split('|')[1]
+      }
+      if (data.sender == context.state.activeId || data.receiver == context.state.activeId) {
+        if (data.sender == context.state.userdata.userid) return
+        context.commit('addToChatlist', data)
+      } else {
+        context.commit('addToMessagelist', data)
+      }
+    } */
   }
 })

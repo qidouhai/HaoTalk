@@ -46,6 +46,7 @@
 </div>
 </template>
 <script>
+/* eslint-disable eqeqeq */
 import editgroup from './editgroup.vue'
 import { http } from '../../libs/http'
 import { addIdList } from '../../libs/utils'

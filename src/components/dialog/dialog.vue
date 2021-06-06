@@ -129,6 +129,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable eqeqeq */
 import { http } from '../../libs/http'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 import {debounce, getVideoCover, deepcopy} from '../../libs/utils'

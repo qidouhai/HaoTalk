@@ -76,6 +76,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable eqeqeq */
 import editinfo from './editinfo.vue'
 import { http } from '../../libs/http'
 import {addIdList} from '../../libs/utils'

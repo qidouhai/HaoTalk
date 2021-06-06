@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 export function debounce (fn, times) {
   let timer = null
   return function () {

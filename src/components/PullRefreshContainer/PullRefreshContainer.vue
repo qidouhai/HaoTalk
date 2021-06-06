@@ -139,16 +139,14 @@ export default {
       if (this.pullState === pullRefreshState.PULLING_READY) {
         this.pullDist = READY_HEIGHT
         this.pullState = pullRefreshState.FETCHING
-
+        // eslint-disable-next-line
         let timeOut = false
         let done = false
         this.$emit('pull-ready', () => {
           done = true
           this.showNoteInitVal = false
-          // if (timeOut) {
           this.pullDist = 0
           this.pullState = pullRefreshState.NONE
-          // }
         })
         setTimeout(() => {
           timeOut = true

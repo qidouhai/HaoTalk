@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 var Salt = {
   name: 'vedioStore',
   version: 1,

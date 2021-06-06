@@ -9,7 +9,7 @@
   </mu-bottom-nav>
 </template>
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 export default {
   name: 'bottomTab',
   data () {
