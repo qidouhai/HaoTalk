@@ -15,15 +15,15 @@
     <mu-sub-header>输入账号，群号码,消息</mu-sub-header>
     <mu-list>
       <mu-sub-header v-if="oldfriend.length">好友/群</mu-sub-header>
-      <div v-for="(item,index) in oldfriend" :key="index">
-        <mu-list-item @click="showMainindex(item)">
+      <div v-for="(item,index) in oldfriend" :key="index" @click="showMainindex(item)">
+        <mu-list-item >
           <mu-checkbox v-if="createroom" v-model="checkvals"/>
           <mu-list-item-action>
             <mu-avatar>
               <img :src="item.avatar">
             </mu-avatar>
           </mu-list-item-action>
-          <mu-list-item-title>{{item.username}}</mu-list-item-title>
+          <mu-list-item-title>{{item.username || item.roomname}}</mu-list-item-title>
           <mu-list-item-action>
             <mu-icon value="chat_bubble"></mu-icon>
           </mu-list-item-action>
@@ -92,7 +92,8 @@ export default {
   },
   computed: {
     ...mapState({
-      friends: state => state.friendList
+      friends: state => state.friendList,
+      rooms: state => state.groupList
     }),
     createroom () {
       return this.$route.params.createroom
@@ -105,31 +106,32 @@ export default {
       if (item.friendid) {
         this.$router.push({path: `/personinfo/${item.friendid}`})
       } else {
-        this.$router.push({path: `/groupinfo/${item.groupid}`})
+        this.$router.push({path: `/groupinfo/${item.roomid}`})
       }
     },
     input (val) {
+      val = val.trim()
       // 判断输入的值是否是数字
       if (val === '') {
         this.oldfriend = []
-      } else if (isNaN(val)) {
-        // 不是数字
-        this.oldfriend = this.friends.filter(x => {
-          if (x.username.indexOf(val) !== -1 || x.littlename.indexOf(val) !== -1) {
-            return true
-          } else {
-            return false
-          }
+      } else if (/[\u4E00-\u9FA5]/.test(val)) {
+        // 有汉字
+        let friendinfo = this.friends.filter(x => {
+          return x.username.indexOf(val) !== -1 || (x.littlename && x.littlename.indexOf(val) !== -1)
         })
+        let roominfo = this.rooms.filter(x => {
+          return x.roomname.indexOf(val) !== -1
+        })
+        this.oldfriend = roominfo.concat(friendinfo)
       } else {
-        // 是数字
-        this.oldfriend = this.friends.filter(x => {
-          if (x.friendid.indexOf(val) !== -1) {
-            return true
-          } else {
-            return false
-          }
+        // 无汉字
+        let friendinfo = this.friends.filter(x => {
+          return x.friendid.indexOf(val) !== -1
         })
+        let roominfo = this.rooms.filter(x => {
+          return x.roomid.indexOf(val) !== -1
+        })
+        this.oldfriend = roominfo.concat(friendinfo)
       }
     },
     back () {

@@ -6,9 +6,11 @@
     </div>
     <div class="container-content">
       <div class="patch"></div>
+      <!-- <transition :name="transitionName"> -->
       <keep-alive>
       <router-view></router-view>
       </keep-alive>
+      <!-- </transition> -->
       <div class="patch"></div>
     </div>
     <div class="container-bottom">
@@ -24,6 +26,11 @@ import topNav from './components/topnav/top-nav'
 import mySidebar from './components/sidebar/sidebar'
 export default {
   name: 'App',
+  data () {
+    return {
+      transitionName: ''
+    }
+  },
   components: {
     bottomTab,
     topNav,
@@ -33,6 +40,24 @@ export default {
     showSidebar (flag) {
       this.$store.commit('showSidebar', {flag})
     }
+  },
+  watch: {
+    /* $route (to, from) {
+      // 将不想有过渡动画效果的部分路由写进判断条件中
+      if (!(to.name in ['message', 'friends', 'discover']) && !(from.name in ['message', 'friends', 'discover'])) {
+        // 如果to索引大于from索引,判断为前进状态,反之则为后退状态
+        if (to.meta.index < from.meta.index) {
+        // 设置动画名称
+          this.transitionName = 'slide-left'
+        } else if (to.meta.index > from.meta.index) {
+          this.transitionName = 'slide-right'
+        } else if (to.meta.index == 99) {
+          this.transitionName = ''
+        }
+      } else {
+        this.transitionName = ''
+      }
+    } */
   }
 }
 </script>

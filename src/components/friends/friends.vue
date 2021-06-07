@@ -15,8 +15,8 @@
     </div>
     <div class="tab">
       <mu-tabs full-width>
-        <mu-tab value="tab1" disabled>
-          <mu-icon value="person_add" color='green'></mu-icon>
+        <mu-tab value="tab1" disabled >
+          <mu-icon value="person_add" color='green' @click="showSearch()"></mu-icon>
           新朋友
         </mu-tab>
         <mu-tab value="tab2" disabled>
@@ -155,6 +155,9 @@ export default {
     showGroupindex (e) {
       this.$store.commit('getActiveId', { activeId: e })
       this.$router.push({path: `/groupinfo/${e}`})
+    },
+    showSearch (flag = false) {
+      this.$router.push({name: 'search', params: {createroom: flag}})
     }
   }
 }

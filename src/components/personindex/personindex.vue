@@ -5,8 +5,7 @@
         <mu-button slot="left" @click="back" >
           <mu-icon value="arrow_back"></mu-icon>
         </mu-button>
-        <div class="right-top"
-             slot="right">
+        <div class="right-top" slot="right">
           <mu-icon value="more_vert" style="background:white;"/>
         </div>
       </mu-appbar>
@@ -61,7 +60,7 @@
         编辑资料
       </mu-tab>
       <mu-tab v-else>
-        送礼物
+        删除好友
       </mu-tab>
       <mu-tab @click="goDialog">
         发消息
