@@ -39,6 +39,7 @@
         <component
           :is="getMsgItemType(item)"
           :context="item"
+          :data-msgid="item.msgId"
           @img-clicked="picClicked"
           @video-clicked="videoClicked"
           @audio-clicked="audioClicked"
@@ -74,7 +75,9 @@
                        multi-line
                        :rows="1"
                        :rows-max="6"
-                       @focus="focus"
+                       @input="updateTxtBoxHeight"
+                       @blur="txtBoxBlur"
+                       @focus="txtBoxfocus"
                        @keyup.enter.native="send"/>
         <mu-button icon color="primary" @click="send">
           <mu-icon value="send"></mu-icon>
@@ -134,6 +137,7 @@ import { http } from '../../libs/http'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 import {debounce, getVideoCover, deepcopy} from '../../libs/utils'
 import INDEXDB from '../../libs/indexDB'
+// import Eventbus from '../libs/eventbus'
 import PullRefreshContainer from '../PullRefreshContainer/PullRefreshContainer'
 import emojiArea from '../EmojiArea/EmojiArea.vue'
 import VideoPlayer from '../VideoPlayer'
@@ -166,6 +170,7 @@ export default {
       msgTxt: '',
       isEmojiAreaOpen: false,
       isToolboxOpen: false,
+      isOverlayLock: false,
       hasMoreHistory: true,
       noteLastConv: false,
       isBigPicsVisible: false,
@@ -238,6 +243,9 @@ export default {
         return
       }
       this.msgTxt = ''
+      this.$nextTick(() => {
+        this.updateTxtBoxHeight()
+      })
     },
     async resendMsg (item) {
       this.chatList.forEach((m) => {
@@ -269,8 +277,38 @@ export default {
     openEmoji () {
       this.isEmojiAreaOpen = !this.isEmojiAreaOpen
     },
-    focus () {
+    txtBoxfocus () {
       this.closeExtensionArea()
+      setTimeout(() => {
+        document.body.scrollTop = document.body.scrollHeight
+      }, 500)
+    },
+    txtBoxBlur () {
+      this.isTxtBoxFocusing = false
+      setTimeout(() => {
+        document.body.scrollTop = document.body.scrollHeight
+        this.fixIOSKeyBoardBug()
+      }, 100)
+    },
+    // 兼容ios13软键盘收起后页面不回弹
+    fixIOSKeyBoardBug () {
+      window.scrollTo(0, window.pageYOffset)
+    },
+    updateTxtBoxHeight (e) {
+      const elem = document.querySelector('.footer > mu-text-field')
+      elem.style.height = 'auto'
+      elem.style.height = elem.scrollHeight + 'px'
+      elem.scrollTop = elem.scrollHeight
+      document.querySelector('.msg-list-container').scrollTop = document.querySelector('.msg-list-container').scrollHeight + 520
+    },
+    overLayClicked () {
+      if (this.isOverlayLock) return
+      this.isBigPicsVisible = false
+      this.isFinishSessionLayerVisible = false
+      this.isMyPublishPickListLayerVisible = false
+      this.isMyVisitedPublishPickListLayerVisible = false
+      this.isOrderPickListLayerVisible = false
+      this.isReAskActionShow = false
     },
     async fetchHistory (resolve) {
       let lasttime = this.historyList[0] ? this.historyList[0].sendtime : Date.now()
@@ -369,6 +407,9 @@ export default {
     },
     addEmoji (emoji) {
       this.msgTxt = this.msgTxt + emoji
+      this.$nextTick(() => {
+        this.updateTxtBoxHeight()
+      })
     },
     // 滚动到聊天区域最下面
     scrollToBottom (animate) {
@@ -478,6 +519,28 @@ export default {
         this.dealScrollHeight()
       })
     },
+    /* initEventBus () {
+      // 接受eventbus来的消息
+      Eventbus.$on('like', (likeobj) => {
+        if (!likeobj.islike) {
+          console.log('点击了不喜欢')
+          // 无用反馈
+          this.addToChatList({
+            imMsgType: imUIMsgType.COLLECT_EVALUATION,
+            avatar: this.kefuAvatar,
+            fromSelf: false,
+            sendTime: Date.now(),
+            showTime: true,
+            precontext: likeobj.context
+          })
+          this.closeExtensionArea()
+        }
+      })
+      // 雅典娜转人工点击
+      Eventbus.$on('rengong-click', (param) => {
+        this.transferToRengong(param)
+      })
+    }, */
     getMsgItemType (item) {
       return msgTypeMap[item.contexttype]
     },
