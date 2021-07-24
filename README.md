@@ -1,4 +1,4 @@
-# chatapp
+# Haotalk
 
 > A Vue.js project
 
