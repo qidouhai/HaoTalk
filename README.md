@@ -4,6 +4,8 @@
 
 简要介绍和运行界面见目录docx文件
 
+node版本v12.18.1
+
 ## Build Setup
 
 ``` bash
