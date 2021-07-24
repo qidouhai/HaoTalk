@@ -1,6 +1,7 @@
 # Haotalk
 
 > A Vue.js project
+简要介绍见目录文件
 
 ## Build Setup
 
